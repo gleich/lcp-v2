@@ -13,4 +13,7 @@ type SecretsData struct {
 	StravaRefreshTokenExpiration int64  `env:"STRAVA_REFRESH_TOKEN_EXPIRATION"`
 	StravaSubscriptionID         int64  `env:"STRAVA_SUBSCRIPTION_ID"`
 	StravaVerifyToken            string `env:"STRAVA_VERIFY_TOKEN"`
+
+	SteamKey string `env:"STEAM_KEY"`
+	SteamID  string `env:"STEAM_ID"`
 }

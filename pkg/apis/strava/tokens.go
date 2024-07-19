@@ -47,6 +47,7 @@ func (t *Tokens) RefreshIfNeeded() {
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		lumber.Error(err, "sending request for new data token failed")
+		return
 	}
 	defer resp.Body.Close()
 
