@@ -20,13 +20,15 @@ func main() {
 	if err != nil {
 		lumber.Fatal(err, "Error loading .env file")
 	}
-	loadedSecrets, err := env.ParseAs[secrets.Secrets]()
+	loadedSecrets, err := env.ParseAs[secrets.SecretsData]()
 	if err != nil {
 		lumber.Fatal(err, "parsing required env vars failed")
 	}
+	secrets.SECRETS = loadedSecrets
+	lumber.Success("loaded secrets")
 
-	stravaTokens := strava.LoadTokens(loadedSecrets)
-	stravaTokens.RefreshIfNeeded(loadedSecrets)
+	stravaTokens := strava.LoadTokens()
+	stravaTokens.RefreshIfNeeded()
 	stravaActivities := strava.FetchActivities(stravaTokens)
 	stravaCache := cache.New("strava", stravaActivities)
 	lumber.Success("init strava cache")
@@ -34,7 +36,11 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.HandleFunc("/", rootRedirect)
-	r.Get("/strava/cache", stravaCache.Route(loadedSecrets))
+
+	r.Get("/strava/cache", stravaCache.Route())
+	r.Post("/strava/event", strava.EventRoute(&stravaCache, stravaTokens))
+	r.Get("/strava/event", strava.ChallengeRoute)
+
 	err = http.ListenAndServe(":8000", r)
 	if err != nil {
 		lumber.Fatal(err, "failed to start router")

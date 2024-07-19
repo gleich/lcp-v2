@@ -19,26 +19,25 @@ type Tokens struct {
 	ExpiresAt int64  `json:"expires_at"`
 }
 
-func LoadTokens(loadedSecrets secrets.Secrets) Tokens {
+func LoadTokens() Tokens {
 	return Tokens{
-		Access:    loadedSecrets.StravaAccessToken,
-		Refresh:   loadedSecrets.StravaRefreshToken,
-		ExpiresAt: loadedSecrets.StravaRefreshTokenExpiration,
+		Access:    secrets.SECRETS.StravaAccessToken,
+		Refresh:   secrets.SECRETS.StravaRefreshToken,
+		ExpiresAt: secrets.SECRETS.StravaRefreshTokenExpiration,
 	}
 }
 
-func (t *Tokens) RefreshIfNeeded(loadedSecrets secrets.Secrets) {
+func (t *Tokens) RefreshIfNeeded() {
 	if t.ExpiresAt >= time.Now().Unix() {
-		lumber.Debug("Not refreshing token")
 		return
 	}
 
 	params := url.Values{
-		"client_id":     {loadedSecrets.StravaClientID},
-		"client_secret": {loadedSecrets.StravaClientSecret},
+		"client_id":     {secrets.SECRETS.StravaClientID},
+		"client_secret": {secrets.SECRETS.StravaClientSecret},
 		"grant_type":    {"refresh_token"},
 		"refresh_token": {t.Refresh},
-		"code":          {loadedSecrets.StravaOAuthCode},
+		"code":          {secrets.SECRETS.StravaOAuthCode},
 	}
 	req, err := http.NewRequest("POST", "https://www.strava.com/oauth/token?"+params.Encode(), nil)
 	if err != nil {
@@ -72,7 +71,7 @@ func (t *Tokens) RefreshIfNeeded(loadedSecrets secrets.Secrets) {
 	os.Setenv("STRAVA_ACCESS_TOKEN", tokens.Access)
 	os.Setenv("STRAVA_REFRESH_TOKEN", tokens.Refresh)
 	os.Setenv("STRAVA_REFRESH_TOKEN_EXPIRATION", strconv.FormatInt(tokens.ExpiresAt, 10))
-	t = &tokens
+	*t = tokens
 
 	lumber.Success("loaded new strava token data. access:", t.Access, "refresh:", t.Refresh)
 }

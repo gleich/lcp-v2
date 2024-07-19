@@ -64,5 +64,5 @@ func FetchActivities(tokens Tokens) []Activity {
 		return nil
 	}
 
-	return activities
+	return activities[:6]
 }

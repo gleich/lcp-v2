@@ -1,6 +1,8 @@
 package secrets
 
-type Secrets struct {
+var SECRETS SecretsData
+
+type SecretsData struct {
 	ValidToken string `env:"VALID_TOKEN"`
 
 	StravaClientID               string `env:"STRAVA_CLIENT_ID"`
@@ -9,4 +11,6 @@ type Secrets struct {
 	StravaAccessToken            string `env:"STRAVA_ACCESS_TOKEN"`
 	StravaRefreshToken           string `env:"STRAVA_REFRESH_TOKEN"`
 	StravaRefreshTokenExpiration int64  `env:"STRAVA_REFRESH_TOKEN_EXPIRATION"`
+	StravaSubscriptionID         int64  `env:"STRAVA_SUBSCRIPTION_ID"`
+	StravaVerifyToken            string `env:"STRAVA_VERIFY_TOKEN"`
 }
