@@ -8,6 +8,7 @@ import (
 	"github.com/gleich/lcp-v2/pkg/cache"
 	"github.com/gleich/lcp-v2/pkg/secrets"
 	"github.com/gleich/lumber/v2"
+	"github.com/minio/minio-go/v7"
 )
 
 type event struct {
@@ -20,7 +21,7 @@ type event struct {
 	Updates        map[string]string `json:"updates"`
 }
 
-func EventRoute(stravaCache *cache.Cache[[]Activity], tokens Tokens) http.HandlerFunc {
+func EventRoute(stravaCache *cache.Cache[[]Activity], minioClient minio.Client, tokens Tokens) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 		body, err := io.ReadAll(r.Body)
@@ -43,7 +44,7 @@ func EventRoute(stravaCache *cache.Cache[[]Activity], tokens Tokens) http.Handle
 		}
 
 		tokens.RefreshIfNeeded()
-		stravaCache.Update(FetchActivities(tokens))
+		stravaCache.Update(FetchActivities(minioClient, tokens))
 	})
 }
 

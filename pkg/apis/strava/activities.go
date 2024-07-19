@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gleich/lumber/v2"
+	"github.com/minio/minio-go/v7"
 )
 
 type Activity struct {
@@ -35,7 +36,7 @@ type Activity struct {
 	ID                 uint64  `json:"id"`
 }
 
-func FetchActivities(tokens Tokens) []Activity {
+func FetchActivities(minioClient minio.Client, tokens Tokens) []Activity {
 	req, err := http.NewRequest("GET", "https://www.strava.com/api/v3/athlete/activities", nil)
 	if err != nil {
 		lumber.Error(err, "Failed to create new request")
@@ -64,5 +65,15 @@ func FetchActivities(tokens Tokens) []Activity {
 		return nil
 	}
 
-	return activities[:6]
+	activities = activities[:6]
+
+	for _, activity := range activities {
+		mapData := FetchMap(activity.Map.SummaryPolyline)
+		UploadMap(minioClient, activity.ID, mapData)
+	}
+	RemoveOldMaps(minioClient, activities)
+
+	lumber.Success("uploaded", len(activities), "maps to minio")
+
+	return activities
 }

@@ -14,6 +14,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/joho/godotenv"
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/shurcooL/githubv4"
 	"golang.org/x/oauth2"
 )
@@ -23,7 +25,7 @@ func main() {
 
 	err := godotenv.Load()
 	if err != nil {
-		lumber.Fatal(err, "Error loading .env file")
+		lumber.Fatal(err, "loading .env file failed")
 	}
 	loadedSecrets, err := env.ParseAs[secrets.SecretsData]()
 	if err != nil {
@@ -47,10 +49,17 @@ func main() {
 
 	stravaTokens := strava.LoadTokens()
 	stravaTokens.RefreshIfNeeded()
-	stravaActivities := strava.FetchActivities(stravaTokens)
+	minioClient, err := minio.New(secrets.SECRETS.MinioEndpoint, &minio.Options{
+		Creds:  credentials.NewStaticV4(secrets.SECRETS.MinioAccessKeyID, secrets.SECRETS.MinioSecretKey, ""),
+		Secure: true,
+	})
+	if err != nil {
+		lumber.Fatal(err, "failed to create minio client")
+	}
+	stravaActivities := strava.FetchActivities(*minioClient, stravaTokens)
 	stravaCache := cache.New("strava", stravaActivities)
 	r.Get("/strava/cache", stravaCache.Route())
-	r.Post("/strava/event", strava.EventRoute(&stravaCache, stravaTokens))
+	r.Post("/strava/event", strava.EventRoute(&stravaCache, *minioClient, stravaTokens))
 	r.Get("/strava/event", strava.ChallengeRoute)
 	lumber.Success("init strava cache")
 
