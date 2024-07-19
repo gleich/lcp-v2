@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/caarlos0/env/v11"
+	"github.com/gleich/lcp-v2/pkg/apis/strava"
 	"github.com/gleich/lcp-v2/pkg/cache"
 	"github.com/gleich/lcp-v2/pkg/secrets"
-	"github.com/gleich/lcp-v2/pkg/strava"
 	"github.com/gleich/lumber/v2"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"

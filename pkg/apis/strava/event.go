@@ -10,7 +10,7 @@ import (
 	"github.com/gleich/lumber/v2"
 )
 
-type Event struct {
+type event struct {
 	AspectType     string            `json:"aspect_type"`
 	EventTime      int64             `json:"event_time"`
 	ObjectID       int64             `json:"object_id"`
@@ -29,15 +29,15 @@ func EventRoute(stravaCache *cache.Cache[[]Activity], tokens Tokens) http.Handle
 			return
 		}
 
-		var event Event
-		err = json.Unmarshal(body, &event)
+		var eventData event
+		err = json.Unmarshal(body, &eventData)
 		if err != nil {
 			lumber.Error(err, "failed to parse json")
 			lumber.Debug(string(body))
 			return
 		}
 
-		if event.SubscriptionID != secrets.SECRETS.StravaSubscriptionID {
+		if eventData.SubscriptionID != secrets.SECRETS.StravaSubscriptionID {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
