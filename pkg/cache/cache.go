@@ -55,6 +55,7 @@ func (c *Cache[T]) Update(data T) {
 	if !reflect.DeepEqual(data, c.data) {
 		c.data = data
 		c.updated = time.Now()
+		updated = true
 	}
 	c.mutex.Unlock()
 	if updated {
