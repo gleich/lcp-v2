@@ -5,7 +5,6 @@ import (
 
 	"github.com/caarlos0/env/v11"
 	"github.com/gleich/lcp-v2/pkg/apis/steam"
-	"github.com/gleich/lcp-v2/pkg/apis/strava"
 	"github.com/gleich/lcp-v2/pkg/cache"
 	"github.com/gleich/lcp-v2/pkg/secrets"
 	"github.com/gleich/lumber/v2"
@@ -37,14 +36,14 @@ func main() {
 	r.Get("/steam/cache", steamCache.Route())
 	lumber.Success("init steam cache")
 
-	stravaTokens := strava.LoadTokens()
-	stravaTokens.RefreshIfNeeded()
-	stravaActivities := strava.FetchActivities(stravaTokens)
-	stravaCache := cache.New("strava", stravaActivities)
-	r.Get("/strava/cache", stravaCache.Route())
-	r.Post("/strava/event", strava.EventRoute(&stravaCache, stravaTokens))
-	r.Get("/strava/event", strava.ChallengeRoute)
-	lumber.Success("init strava cache")
+	// stravaTokens := strava.LoadTokens()
+	// stravaTokens.RefreshIfNeeded()
+	// stravaActivities := strava.FetchActivities(stravaTokens)
+	// stravaCache := cache.New("strava", stravaActivities)
+	// r.Get("/strava/cache", stravaCache.Route())
+	// r.Post("/strava/event", strava.EventRoute(&stravaCache, stravaTokens))
+	// r.Get("/strava/event", strava.ChallengeRoute)
+	// lumber.Success("init strava cache")
 
 	err = http.ListenAndServe(":8000", r)
 	if err != nil {

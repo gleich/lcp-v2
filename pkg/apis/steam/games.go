@@ -26,14 +26,15 @@ type ownedGamesResponse struct {
 }
 
 type Game struct {
-	Name            string    `json:"name"`
-	AppID           int32     `json:"app_id"`
-	ImgIconURL      string    `json:"img_icon_url"`
-	RTimeLastPlayed time.Time `json:"rtime_last_played"`
-	PlaytimeForever int32     `json:"playtime_forever"`
-	URL             string    `json:"url"`
-	HeaderURL       string    `json:"header_url"`
-	LibraryURL      *string   `json:"library_url"`
+	Name            string         `json:"name"`
+	AppID           int32          `json:"app_id"`
+	ImgIconURL      string         `json:"img_icon_url"`
+	RTimeLastPlayed time.Time      `json:"rtime_last_played"`
+	PlaytimeForever int32          `json:"playtime_forever"`
+	URL             string         `json:"url"`
+	HeaderURL       string         `json:"header_url"`
+	LibraryURL      *string        `json:"library_url"`
+	Achievements    *[]Achievement `json:"achievements"`
 }
 
 func FetchRecentlyPlayedGames() []Game {
@@ -43,12 +44,7 @@ func FetchRecentlyPlayedGames() []Game {
 		"include_appinfo": {"true"},
 		"format":          {"json"},
 	}
-	req, err := http.NewRequest("GET", "https://api.steampowered.com/IPlayerService/GetOwnedGames/v1?"+params.Encode(), nil)
-	if err != nil {
-		lumber.Error(err, "creating request for owned games failed")
-		return nil
-	}
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := http.Get("https://api.steampowered.com/IPlayerService/GetOwnedGames/v1?" + params.Encode())
 	if err != nil {
 		lumber.Error(err, "sending request for owned games failed")
 		return nil
@@ -102,6 +98,7 @@ func FetchRecentlyPlayedGames() []Game {
 			URL:             fmt.Sprintf("https://store.steampowered.com/app/%d/", g.AppID),
 			HeaderURL:       fmt.Sprintf("https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/%d/header.jpg", g.AppID),
 			LibraryURL:      libraryURLPtr,
+			Achievements:    FetchGameAchievements(g.AppID),
 		})
 	}
 
