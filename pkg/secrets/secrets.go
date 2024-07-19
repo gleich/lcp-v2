@@ -16,4 +16,6 @@ type SecretsData struct {
 
 	SteamKey string `env:"STEAM_KEY"`
 	SteamID  string `env:"STEAM_ID"`
+
+	GitHubAccessToken string `env:"GITHUB_ACCESS_TOKEN"`
 }
