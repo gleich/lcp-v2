@@ -26,15 +26,16 @@ type ownedGamesResponse struct {
 }
 
 type Game struct {
-	Name            string         `json:"name"`
-	AppID           int32          `json:"app_id"`
-	ImgIconURL      string         `json:"img_icon_url"`
-	RTimeLastPlayed time.Time      `json:"rtime_last_played"`
-	PlaytimeForever int32          `json:"playtime_forever"`
-	URL             string         `json:"url"`
-	HeaderURL       string         `json:"header_url"`
-	LibraryURL      *string        `json:"library_url"`
-	Achievements    *[]Achievement `json:"achievements"`
+	Name                string         `json:"name"`
+	AppID               int32          `json:"app_id"`
+	IconURL             string         `json:"icon_url"`
+	RTimeLastPlayed     time.Time      `json:"rtime_last_played"`
+	PlaytimeForever     int32          `json:"playtime_forever"`
+	URL                 string         `json:"url"`
+	HeaderURL           string         `json:"header_url"`
+	LibraryURL          *string        `json:"library_url"`
+	AchievementProgress *float32       `json:"achievement_progress"`
+	Achievements        *[]Achievement `json:"achievements"`
 }
 
 func FetchRecentlyPlayedGames() []Game {
@@ -89,16 +90,19 @@ func FetchRecentlyPlayedGames() []Game {
 			libraryURLPtr = &libraryURL
 		}
 
+		achievementPercentage, achievements := FetchGameAchievements(g.AppID)
+
 		games = append(games, Game{
-			Name:            g.Name,
-			AppID:           g.AppID,
-			ImgIconURL:      fmt.Sprintf("https://media.steampowered.com/steamcommunity/public/images/apps/%d/%s.jpg", g.AppID, g.ImgIconURL),
-			RTimeLastPlayed: time.Unix(g.RTimeLastPlayed, 0),
-			PlaytimeForever: g.PlaytimeForever,
-			URL:             fmt.Sprintf("https://store.steampowered.com/app/%d/", g.AppID),
-			HeaderURL:       fmt.Sprintf("https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/%d/header.jpg", g.AppID),
-			LibraryURL:      libraryURLPtr,
-			Achievements:    FetchGameAchievements(g.AppID),
+			Name:                g.Name,
+			AppID:               g.AppID,
+			IconURL:             fmt.Sprintf("https://media.steampowered.com/steamcommunity/public/images/apps/%d/%s.jpg", g.AppID, g.ImgIconURL),
+			RTimeLastPlayed:     time.Unix(g.RTimeLastPlayed, 0),
+			PlaytimeForever:     g.PlaytimeForever,
+			URL:                 fmt.Sprintf("https://store.steampowered.com/app/%d/", g.AppID),
+			HeaderURL:           fmt.Sprintf("https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/%d/header.jpg", g.AppID),
+			LibraryURL:          libraryURLPtr,
+			AchievementProgress: achievementPercentage,
+			Achievements:        achievements,
 		})
 	}
 

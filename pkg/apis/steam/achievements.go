@@ -45,7 +45,7 @@ type Achievement struct {
 	UnlockTime  *time.Time `json:"unlock_time"`
 }
 
-func FetchGameAchievements(appID int32) *[]Achievement {
+func FetchGameAchievements(appID int32) (*float32, *[]Achievement) {
 	params := url.Values{
 		"key":     {secrets.SECRETS.SteamKey},
 		"steamid": {secrets.SECRETS.SteamID},
@@ -55,21 +55,21 @@ func FetchGameAchievements(appID int32) *[]Achievement {
 	resp, err := http.Get("https://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001?" + params.Encode())
 	if err != nil {
 		lumber.Error(err, "sending request for player achievements from", appID, "failed")
-		return nil
+		return nil, nil
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		lumber.Error(err, "reading response body for player achievements from", appID, "failed")
-		return nil
+		return nil, nil
 	}
 	if string(body) == `{"playerstats":{"error":"Requested app has no stats","success":false}}` {
-		return nil
+		return nil, nil
 	}
 	if resp.StatusCode != http.StatusOK {
 		lumber.ErrorMsg(resp.StatusCode, "when trying to get player achievements for", appID, string(body))
-		return nil
+		return nil, nil
 	}
 
 	var playerAchievements playerAchievementsResponse
@@ -77,11 +77,11 @@ func FetchGameAchievements(appID int32) *[]Achievement {
 	if err != nil {
 		lumber.Error(err, "failed to parse json for player achievements for", appID)
 		lumber.Debug("body:", string(body))
-		return nil
+		return nil, nil
 	}
 
 	if playerAchievements.PlayerStats.Achievements == nil {
-		return nil
+		return nil, nil
 	}
 
 	params = url.Values{
@@ -92,18 +92,18 @@ func FetchGameAchievements(appID int32) *[]Achievement {
 	resp, err = http.Get("https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2?" + params.Encode())
 	if err != nil {
 		lumber.Error(err, "sending request for owned games failed")
-		return nil
+		return nil, nil
 	}
 	defer resp.Body.Close()
 
 	body, err = io.ReadAll(resp.Body)
 	if err != nil {
 		lumber.Error(err, "reading response body for game schema failed for", appID)
-		return nil
+		return nil, nil
 	}
 	if resp.StatusCode != http.StatusOK {
 		lumber.ErrorMsg(resp.StatusCode, "when trying to get player achievements for", appID, string(body))
-		return nil
+		return nil, nil
 	}
 
 	var gameSchema schemaGameResponse
@@ -111,7 +111,7 @@ func FetchGameAchievements(appID int32) *[]Achievement {
 	if err != nil {
 		lumber.Error(err, "failed to parse json for game schema for", appID)
 		lumber.Debug("body:", string(body))
-		return nil
+		return nil, nil
 	}
 
 	var achievements []Achievement
@@ -134,6 +134,14 @@ func FetchGameAchievements(appID int32) *[]Achievement {
 		}
 	}
 
+	var totalAchieved int
+	for _, achievement := range achievements {
+		if achievement.Achieved {
+			totalAchieved++
+		}
+	}
+	achievementPercentage := (float32(totalAchieved) / float32(len(achievements))) * 100.0
+
 	sort.Slice(achievements, func(i, j int) bool {
 		if achievements[i].UnlockTime == nil && achievements[j].UnlockTime == nil {
 			return false
@@ -151,5 +159,5 @@ func FetchGameAchievements(appID int32) *[]Achievement {
 		achievements = achievements[:20]
 	}
 
-	return &achievements
+	return &achievementPercentage, &achievements
 }

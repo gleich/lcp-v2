@@ -3,6 +3,7 @@ package strava
 import (
 	"encoding/json"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -74,5 +75,6 @@ func (t *Tokens) RefreshIfNeeded() {
 	os.Setenv("STRAVA_REFRESH_TOKEN_EXPIRATION", strconv.FormatInt(tokens.ExpiresAt, 10))
 	*t = tokens
 
-	lumber.Success("loaded new strava token data. access:", t.Access, "refresh:", t.Refresh)
+	lumber.Success("loaded new strava token data")
+	log.Println("access:", t.Access, "refresh:", t.Refresh)
 }
