@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/caarlos0/env/v11"
 	"github.com/gleich/lcp-v2/pkg/apis/github"
@@ -46,6 +47,7 @@ func main() {
 	githubCache := cache.New("github", github.FetchPinnedRepos(githubClient))
 	r.Get("/github/cache", githubCache.Route())
 	lumber.Success("init github cache")
+	go githubCache.PeriodicUpdate(func() []github.Repository { return github.FetchPinnedRepos(githubClient) }, 5*time.Minute)
 
 	stravaTokens := strava.LoadTokens()
 	stravaTokens.RefreshIfNeeded()
@@ -67,6 +69,7 @@ func main() {
 	steamCache := cache.New("steam", games)
 	r.Get("/steam/cache", steamCache.Route())
 	lumber.Success("init steam cache")
+	go steamCache.PeriodicUpdate(steam.FetchRecentlyPlayedGames, 5*time.Minute)
 
 	err = http.ListenAndServe(":8000", r)
 	if err != nil {

@@ -61,3 +61,11 @@ func (c *Cache[T]) Update(data T) {
 		lumber.Success(c.Name, "updated")
 	}
 }
+
+func (c *Cache[T]) PeriodicUpdate(updateFunc func() T, interval time.Duration) {
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+	for range ticker.C {
+		c.Update(updateFunc())
+	}
+}
