@@ -1,9 +1,9 @@
 package strava
 
 import (
-	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 
@@ -14,7 +14,7 @@ import (
 
 const bucketName = "mapbox-maps"
 
-func FetchMap(polyline string) []byte {
+func FetchMap(polyline string) io.Reader {
 	var (
 		lineWidth = 2.0
 		lineColor = "000"
@@ -32,26 +32,21 @@ func FetchMap(polyline string) []byte {
 		return nil
 	}
 
-	var b bytes.Buffer
-	_, err = b.ReadFrom(resp.Body)
-	if err != nil {
-		lumber.Error(err, "failed to read data from request")
-		return nil
-	}
-
-	return b.Bytes()
+	return resp.Body
 }
 
-func UploadMap(minioClient minio.Client, id uint64, data []byte) {
-	reader := bytes.NewReader(data)
-	size := int64(len(data))
+func UploadMap(minioClient minio.Client, id uint64, reader io.Reader) {
+	data, err := io.ReadAll(reader)
+	if err != nil {
+		lumber.Error(err, "reading from mapbox image failed")
+	}
 
-	_, err := minioClient.PutObject(
+	_, err = minioClient.PutObject(
 		context.Background(),
 		bucketName,
-		fmt.Sprintf("%d.jpg", id),
+		fmt.Sprintf("%d.png", id),
 		reader,
-		size,
+		int64(len(data)),
 		minio.PutObjectOptions{ContentType: "image/png"},
 	)
 	if err != nil {
@@ -62,7 +57,7 @@ func UploadMap(minioClient minio.Client, id uint64, data []byte) {
 func RemoveOldMaps(minioClient minio.Client, activities []Activity) {
 	var validKeys []string
 	for _, activity := range activities {
-		validKeys = append(validKeys, fmt.Sprintf("%d.jpg", activity.ID))
+		validKeys = append(validKeys, fmt.Sprintf("%d.png", activity.ID))
 	}
 
 	objects := minioClient.ListObjects(context.Background(), bucketName, minio.ListObjectsOptions{})
