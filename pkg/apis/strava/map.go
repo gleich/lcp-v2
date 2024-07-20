@@ -61,7 +61,7 @@ func MapBlurData(data []byte) *string {
 		return nil
 	}
 
-	scaleDownFactor := 200
+	scaleDownFactor := 20
 	blurImage, err := blurhash.Decode(blurData, width/scaleDownFactor, height/scaleDownFactor, 1)
 	if err != nil {
 		lumber.Error(err, "decoding blurhash data into img failed")
