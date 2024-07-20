@@ -38,8 +38,8 @@ func (c *Cache[T]) Route() http.HandlerFunc {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
-		w.Header().Set("Content-Type", "application/json")
 		c.mutex.RLock()
+		w.Header().Set("Content-Type", "application/json")
 		err := json.NewEncoder(w).Encode(response[T]{Data: c.data, Updated: c.updated})
 		c.mutex.RUnlock()
 		if err != nil {
