@@ -16,7 +16,8 @@ type Activity struct {
 	StartDate time.Time `json:"start_date"`
 	Timezone  string    `json:"timezone"`
 	Map       struct {
-		SummaryPolyline string `json:"summary_polyline"`
+		SummaryPolyline string  `json:"summary_polyline"`
+		MapBlurImage    *string `json:"map_blur_image"`
 	} `json:"map"`
 	Trainer            bool    `json:"trainer"`
 	Commute            bool    `json:"commute"`
@@ -67,9 +68,10 @@ func FetchActivities(minioClient minio.Client, tokens Tokens) []Activity {
 
 	activities = activities[:6]
 
-	for _, activity := range activities {
+	for i, activity := range activities {
 		mapData := FetchMap(activity.Map.SummaryPolyline)
 		UploadMap(minioClient, activity.ID, mapData)
+		activities[i].Map.MapBlurImage = MapBlurData(mapData)
 	}
 	RemoveOldMaps(minioClient, activities)
 

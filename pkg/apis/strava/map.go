@@ -3,10 +3,13 @@ package strava
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"fmt"
+	"image/png"
 	"net/http"
 	"net/url"
 
+	"github.com/buckket/go-blurhash"
 	"github.com/gleich/lcp-v2/pkg/secrets"
 	"github.com/gleich/lumber/v2"
 	"github.com/minio/minio-go/v7"
@@ -40,6 +43,38 @@ func FetchMap(polyline string) []byte {
 	}
 
 	return b.Bytes()
+}
+
+func MapBlurData(data []byte) *string {
+	reader := bytes.NewReader(data)
+	parsedPNG, err := png.Decode(reader)
+	if err != nil {
+		lumber.Error(err, "decoding PNG failed")
+		return nil
+	}
+
+	width := parsedPNG.Bounds().Dx()
+	height := parsedPNG.Bounds().Dy()
+	blurData, err := blurhash.Encode(4, 3, parsedPNG)
+	if err != nil {
+		lumber.Error(err, "encoding png into blurhash failed")
+		return nil
+	}
+
+	scaleDownFactor := 200
+	blurImage, err := blurhash.Decode(blurData, width/scaleDownFactor, height/scaleDownFactor, 1)
+	if err != nil {
+		lumber.Error(err, "decoding blurhash data into img failed")
+		return nil
+	}
+	blurImageBuffer := new(bytes.Buffer)
+	err = png.Encode(blurImageBuffer, blurImage)
+	if err != nil {
+		lumber.Error(err, "creating png based off blurred image failed")
+		return nil
+	}
+	blurDataURI := "data:image/png;base64," + base64.StdEncoding.EncodeToString(blurImageBuffer.Bytes())
+	return &blurDataURI
 }
 
 func UploadMap(minioClient minio.Client, id uint64, data []byte) {
