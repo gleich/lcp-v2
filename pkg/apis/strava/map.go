@@ -49,7 +49,7 @@ func UploadMap(minioClient minio.Client, id uint64, data []byte) {
 	_, err := minioClient.PutObject(
 		context.Background(),
 		bucketName,
-		fmt.Sprintf("%d.jpg", id),
+		fmt.Sprintf("%d.png", id),
 		reader,
 		size,
 		minio.PutObjectOptions{ContentType: "image/png"},
@@ -62,7 +62,7 @@ func UploadMap(minioClient minio.Client, id uint64, data []byte) {
 func RemoveOldMaps(minioClient minio.Client, activities []Activity) {
 	var validKeys []string
 	for _, activity := range activities {
-		validKeys = append(validKeys, fmt.Sprintf("%d.jpg", activity.ID))
+		validKeys = append(validKeys, fmt.Sprintf("%d.png", activity.ID))
 	}
 
 	objects := minioClient.ListObjects(context.Background(), bucketName, minio.ListObjectsOptions{})
