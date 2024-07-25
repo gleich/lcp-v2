@@ -17,6 +17,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/shurcooL/githubv4"
 	"golang.org/x/oauth2"
 )
@@ -38,6 +39,7 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.HandleFunc("/", rootRedirect)
+	r.HandleFunc("/metrics", promhttp.Handler().ServeHTTP)
 
 	githubTokenSource := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: secrets.SECRETS.GitHubAccessToken},
