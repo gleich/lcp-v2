@@ -6,8 +6,6 @@ COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o /bin/lcp ./main.go && touch .env
 
-RUN ls -l /bin/lcp
-
 FROM alpine
 
 RUN apk add --no-cache ca-certificates
