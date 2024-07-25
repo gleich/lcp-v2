@@ -155,8 +155,8 @@ func FetchGameAchievements(appID int32) (*float32, *[]Achievement) {
 		return achievements[i].UnlockTime.After(*achievements[j].UnlockTime)
 	})
 
-	if len(achievements) > 20 {
-		achievements = achievements[:20]
+	if len(achievements) > 5 {
+		achievements = achievements[:5]
 	}
 
 	return &achievementPercentage, &achievements

@@ -106,5 +106,5 @@ func FetchRecentlyPlayedGames() []Game {
 		})
 	}
 
-	return games
+	return games[:3]
 }
