@@ -2,20 +2,26 @@ package cache
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"reflect"
 	"sync"
 	"time"
 
+	"github.com/gleich/lcp-v2/pkg/metrics"
 	"github.com/gleich/lcp-v2/pkg/secrets"
 	"github.com/gleich/lumber/v2"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 )
 
 type Cache[T any] struct {
-	Name    string
-	mutex   sync.RWMutex
-	data    T
-	updated time.Time
+	Name           string
+	mutex          sync.RWMutex
+	data           T
+	updated        time.Time
+	updateCounter  prometheus.Counter
+	requestCounter prometheus.Counter
 }
 
 func New[T any](name string, data T) Cache[T] {
@@ -23,6 +29,14 @@ func New[T any](name string, data T) Cache[T] {
 		Name:    name,
 		data:    data,
 		updated: time.Now(),
+		updateCounter: promauto.NewCounter(prometheus.CounterOpts{
+			Name: fmt.Sprintf("cache_%s_updates", name),
+			Help: fmt.Sprintf(`The total number of times the cache "%s" has been updated`, name),
+		}),
+		requestCounter: promauto.NewCounter(prometheus.CounterOpts{
+			Name: fmt.Sprintf("cache_%s_requests", name),
+			Help: fmt.Sprintf(`The total number of times the cache "%s" has been requested`, name),
+		}),
 	}
 }
 
@@ -42,6 +56,7 @@ func (c *Cache[T]) Route() http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 		err := json.NewEncoder(w).Encode(response[T]{Data: c.data, Updated: c.updated})
 		c.mutex.RUnlock()
+		c.requestCounter.Inc()
 		if err != nil {
 			lumber.Error(err, "failed to write data")
 		}
@@ -58,6 +73,8 @@ func (c *Cache[T]) Update(data T) {
 		updated = true
 	}
 	c.mutex.Unlock()
+	c.updateCounter.Inc()
+	metrics.CacheUpdates.Inc()
 	if updated {
 		lumber.Success(c.Name, "updated")
 	}

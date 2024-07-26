@@ -38,6 +38,8 @@ func main() {
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
+	r.Use(middleware.RedirectSlashes)
 	r.HandleFunc("/", rootRedirect)
 	r.HandleFunc("/metrics", promhttp.Handler().ServeHTTP)
 
