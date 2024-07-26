@@ -6,10 +6,11 @@ COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o /bin/lcp ./main.go && touch .env
 
-FROM alpine
+FROM alpine:3.20.2
 
-RUN apk add --no-cache ca-certificates
+RUN apk add --no-cache ca-certificates=20240705-r0
 
+WORKDIR /src
 COPY --from=build /bin/lcp /bin/lcp
 COPY --from=build /src/.env ./.env
 
