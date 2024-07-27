@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"path/filepath"
 	"reflect"
 	"sync"
 	"time"
@@ -22,13 +23,12 @@ type Cache[T any] struct {
 	updated        time.Time
 	updateCounter  prometheus.Counter
 	requestCounter prometheus.Counter
+	filePath       string
 }
 
-func New[T any](name string, data T) Cache[T] {
-	return Cache[T]{
-		Name:    name,
-		data:    data,
-		updated: time.Now(),
+func New[T any](name string, data T) *Cache[T] {
+	cache := Cache[T]{
+		Name: name,
 		updateCounter: promauto.NewCounter(prometheus.CounterOpts{
 			Name: fmt.Sprintf("cache_%s_updates", name),
 			Help: fmt.Sprintf(`The total number of times the cache "%s" has been updated`, name),
@@ -37,10 +37,15 @@ func New[T any](name string, data T) Cache[T] {
 			Name: fmt.Sprintf("cache_%s_requests", name),
 			Help: fmt.Sprintf(`The total number of times the cache "%s" has been requested`, name),
 		}),
+		filePath: filepath.Join(cacheFolder, fmt.Sprintf("%s.json", name)),
 	}
+	cache.seedFromFile()
+	cache.Update(data)
+	cache.writeToFile()
+	return &cache
 }
 
-type response[T any] struct {
+type cacheData[T any] struct {
 	Data    T         `json:"data"`
 	Updated time.Time `json:"updated"`
 }
@@ -54,7 +59,7 @@ func (c *Cache[T]) Route() http.HandlerFunc {
 		}
 		c.mutex.RLock()
 		w.Header().Set("Content-Type", "application/json")
-		err := json.NewEncoder(w).Encode(response[T]{Data: c.data, Updated: c.updated})
+		err := json.NewEncoder(w).Encode(cacheData[T]{Data: c.data, Updated: c.updated})
 		c.mutex.RUnlock()
 		c.requestCounter.Inc()
 		if err != nil {
@@ -75,6 +80,7 @@ func (c *Cache[T]) Update(data T) {
 	c.mutex.Unlock()
 	c.updateCounter.Inc()
 	metrics.CacheUpdates.Inc()
+	c.writeToFile()
 	if updated {
 		lumber.Success(c.Name, "updated")
 	}

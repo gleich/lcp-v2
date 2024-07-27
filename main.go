@@ -65,7 +65,7 @@ func main() {
 	stravaActivities := strava.FetchActivities(*minioClient, stravaTokens)
 	stravaCache := cache.New("strava", stravaActivities)
 	r.Get("/strava/cache", stravaCache.Route())
-	r.Post("/strava/event", strava.EventRoute(&stravaCache, *minioClient, stravaTokens))
+	r.Post("/strava/event", strava.EventRoute(stravaCache, *minioClient, stravaTokens))
 	r.Get("/strava/event", strava.ChallengeRoute)
 	lumber.Success("init strava cache")
 
