@@ -82,10 +82,10 @@ func (c *Cache[T]) Update(data T) {
 		updated = true
 	}
 	c.mutex.Unlock()
-	c.updateCounter.Inc()
-	metrics.CacheUpdates.Inc()
-	c.writeToFile()
 	if updated {
+		c.updateCounter.Inc()
+		metrics.CacheUpdates.Inc()
+		c.writeToFile()
 		lumber.Success(c.Name, "updated")
 	}
 }
