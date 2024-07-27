@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"time"
 
@@ -75,6 +76,8 @@ func main() {
 	lumber.Success("init steam cache")
 	go steamCache.PeriodicUpdate(steam.FetchRecentlyPlayedGames, 5*time.Minute)
 
+	log.Println()
+	lumber.Info("STARTING SERVER")
 	err = http.ListenAndServe(":8000", r)
 	if err != nil {
 		lumber.Fatal(err, "failed to start router")
