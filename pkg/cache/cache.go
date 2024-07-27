@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"path/filepath"
-	"reflect"
 	"sync"
 	"time"
 
@@ -71,12 +70,12 @@ func (c *Cache[T]) Route() http.HandlerFunc {
 func (c *Cache[T]) Update(data T) {
 	var updated bool
 	c.mutex.Lock()
-	if !reflect.DeepEqual(data, c.data) {
-		lumber.Debug("caches are not the same for", c.Name)
-		old, _ := json.Marshal(c.data)
-		lumber.Debug("old cache:", string(old))
-		new, _ := json.Marshal(data)
-		lumber.Debug("new cache:", string(new))
+	lumber.Debug(c.Name)
+	old, _ := json.Marshal(c.data)
+	lumber.Debug("old cache:", string(old))
+	new, _ := json.Marshal(data)
+	lumber.Debug("new cache:", string(new))
+	if string(old) != string(new) {
 		c.data = data
 		c.updated = time.Now()
 		updated = true
