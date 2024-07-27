@@ -33,7 +33,10 @@ func (c *Cache[T]) writeToFile() {
 	}
 	defer file.Close()
 
-	b, err := json.Marshal(c.data)
+	b, err := json.Marshal(cacheData[T]{
+		Data:    c.data,
+		Updated: c.updated,
+	})
 	if err != nil {
 		lumber.Error(err, "encoding data to json failed")
 		return
