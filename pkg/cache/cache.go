@@ -70,11 +70,16 @@ func (c *Cache[T]) Route() http.HandlerFunc {
 func (c *Cache[T]) Update(data T) {
 	var updated bool
 	c.mutex.Lock()
-	lumber.Debug(c.Name)
-	old, _ := json.Marshal(c.data)
-	lumber.Debug("old cache:", string(old))
-	new, _ := json.Marshal(data)
-	lumber.Debug("new cache:", string(new))
+	old, err := json.Marshal(c.data)
+	if err != nil {
+		lumber.Error(err, "failed to json marshal old data")
+		return
+	}
+	new, err := json.Marshal(data)
+	if err != nil {
+		lumber.Error(err, "failed to json marshal new data")
+		return
+	}
 	if string(old) != string(new) {
 		c.data = data
 		c.updated = time.Now()
