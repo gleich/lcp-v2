@@ -50,7 +50,7 @@ func main() {
 	githubClient := githubv4.NewClient(githubHttpClient)
 	githubCache := cache.New("github", github.FetchPinnedRepos(githubClient))
 	r.Get("/github/cache", githubCache.Route())
-	lumber.Success("init github cache")
+	lumber.Success("setup github cache")
 	go githubCache.PeriodicUpdate(func() []github.Repository { return github.FetchPinnedRepos(githubClient) }, 5*time.Minute)
 
 	stravaTokens := strava.LoadTokens()
@@ -67,12 +67,12 @@ func main() {
 	r.Get("/strava/cache", stravaCache.Route())
 	r.Post("/strava/event", strava.EventRoute(stravaCache, *minioClient, stravaTokens))
 	r.Get("/strava/event", strava.ChallengeRoute)
-	lumber.Success("init strava cache")
+	lumber.Success("setup strava cache")
 
 	games := steam.FetchRecentlyPlayedGames()
 	steamCache := cache.New("steam", games)
 	r.Get("/steam/cache", steamCache.Route())
-	lumber.Success("init steam cache")
+	lumber.Success("setup steam cache")
 	go steamCache.PeriodicUpdate(steam.FetchRecentlyPlayedGames, 5*time.Minute)
 
 	err = http.ListenAndServe(":8000", r)
