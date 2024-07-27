@@ -41,7 +41,6 @@ func New[T any](name string, data T) *Cache[T] {
 	}
 	cache.seedFromFile()
 	cache.Update(data)
-	cache.writeToFile()
 	return &cache
 }
 

@@ -25,7 +25,7 @@ func (c *Cache[T]) writeToFile() {
 			return
 		}
 	} else {
-		file, err = os.OpenFile(c.filePath, os.O_WRONLY|os.O_TRUNC, 0600)
+		file, err = os.OpenFile(c.filePath, os.O_WRONLY|os.O_TRUNC, 0666)
 		if err != nil {
 			lumber.Error(err, "failed to read file at path:", c.filePath)
 			return
