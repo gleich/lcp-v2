@@ -75,6 +75,7 @@ func main() {
 	lumber.Success("setup steam cache")
 	go steamCache.PeriodicUpdate(steam.FetchRecentlyPlayedGames, 5*time.Minute)
 
+	lumber.Info("starting server")
 	err = http.ListenAndServe(":8000", r)
 	if err != nil {
 		lumber.Fatal(err, "failed to start router")
