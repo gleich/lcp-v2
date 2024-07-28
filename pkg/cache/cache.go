@@ -25,7 +25,7 @@ type Cache[T any] struct {
 	filePath       string
 }
 
-func New[T any](name string, data T) *Cache[T] {
+func NewCache[T any](name string, data T) *Cache[T] {
 	cache := Cache[T]{
 		Name: name,
 		updateCounter: promauto.NewCounter(prometheus.CounterOpts{
@@ -38,7 +38,7 @@ func New[T any](name string, data T) *Cache[T] {
 		}),
 		filePath: filepath.Join(cacheFolder, fmt.Sprintf("%s.json", name)),
 	}
-	cache.seedFromFile()
+	cache.loadFromFile()
 	cache.Update(data)
 	return &cache
 }
@@ -49,7 +49,7 @@ type cacheData[T any] struct {
 }
 
 // Handle a GET request to load data from the given cache
-func (c *Cache[T]) Route() http.HandlerFunc {
+func (c *Cache[T]) ServeHTTP() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("Authorization") != "Bearer "+secrets.SECRETS.ValidToken {
 			w.WriteHeader(http.StatusUnauthorized)
@@ -89,12 +89,12 @@ func (c *Cache[T]) Update(data T) {
 	if updated {
 		c.updateCounter.Inc()
 		metrics.CacheUpdates.Inc()
-		c.writeToFile()
+		c.persistToFile()
 		lumber.Success(c.Name, "updated")
 	}
 }
 
-func (c *Cache[T]) PeriodicUpdate(updateFunc func() T, interval time.Duration) {
+func (c *Cache[T]) StartPeriodicUpdate(updateFunc func() T, interval time.Duration) {
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
 	for range ticker.C {

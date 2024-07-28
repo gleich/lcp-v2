@@ -10,7 +10,7 @@ import (
 
 const cacheFolder = "/caches/"
 
-func (c *Cache[T]) writeToFile() {
+func (c *Cache[T]) persistToFile() {
 	var file *os.File
 	if _, err := os.Stat(c.filePath); os.IsNotExist(err) {
 		folder := filepath.Dir(c.filePath)
@@ -47,9 +47,9 @@ func (c *Cache[T]) writeToFile() {
 	}
 }
 
-// Seed the cache from the persistent cache file
-// returns if the cache was able to be seeded or not
-func (c *Cache[T]) seedFromFile() {
+// Load the cache from the persistent cache file
+// returns if the cache was able to be loaded or not
+func (c *Cache[T]) loadFromFile() {
 	if _, err := os.Stat(c.filePath); !os.IsNotExist(err) {
 		b, err := os.ReadFile(c.filePath)
 		if err != nil {
