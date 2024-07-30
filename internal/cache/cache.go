@@ -90,7 +90,7 @@ func (c *Cache[T]) Update(data T) {
 		c.updateCounter.Inc()
 		metrics.CacheUpdates.Inc()
 		c.persistToFile()
-		lumber.Success(c.Name, "updated")
+		lumber.Success(c.Name, "cache updated")
 	}
 }
 
