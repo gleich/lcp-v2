@@ -17,7 +17,7 @@ import (
 
 const bucketName = "mapbox-maps"
 
-func FetchMap(polyline string) []byte {
+func fetchMap(polyline string) []byte {
 	var (
 		lineWidth = 2.0
 		lineColor = "000"
@@ -45,7 +45,7 @@ func FetchMap(polyline string) []byte {
 	return b.Bytes()
 }
 
-func MapBlurData(data []byte) *string {
+func mapBlurData(data []byte) *string {
 	reader := bytes.NewReader(data)
 	parsedPNG, err := png.Decode(reader)
 	if err != nil {
@@ -77,7 +77,7 @@ func MapBlurData(data []byte) *string {
 	return &blurDataURI
 }
 
-func UploadMap(minioClient minio.Client, id uint64, data []byte) {
+func uploadMap(minioClient minio.Client, id uint64, data []byte) {
 	reader := bytes.NewReader(data)
 	size := int64(len(data))
 
@@ -94,7 +94,7 @@ func UploadMap(minioClient minio.Client, id uint64, data []byte) {
 	}
 }
 
-func RemoveOldMaps(minioClient minio.Client, activities []Activity) {
+func removeOldMaps(minioClient minio.Client, activities []activity) {
 	var validKeys []string
 	for _, activity := range activities {
 		validKeys = append(validKeys, fmt.Sprintf("%d.png", activity.ID))

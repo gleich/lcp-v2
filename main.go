@@ -1,40 +1,22 @@
 package main
 
 import (
-	"context"
 	"net/http"
-	"time"
 
-	"github.com/caarlos0/env/v11"
 	"github.com/gleich/lcp-v2/pkg/apis/github"
 	"github.com/gleich/lcp-v2/pkg/apis/steam"
 	"github.com/gleich/lcp-v2/pkg/apis/strava"
-	"github.com/gleich/lcp-v2/pkg/cache"
 	"github.com/gleich/lcp-v2/pkg/secrets"
 	"github.com/gleich/lumber/v2"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/joho/godotenv"
-	"github.com/minio/minio-go/v7"
-	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/shurcooL/githubv4"
-	"golang.org/x/oauth2"
 )
 
 func main() {
 	lumber.Info("booted")
 
-	err := godotenv.Load()
-	if err != nil {
-		lumber.Fatal(err, "loading .env file failed")
-	}
-	loadedSecrets, err := env.ParseAs[secrets.SecretsData]()
-	if err != nil {
-		lumber.Fatal(err, "parsing required env vars failed")
-	}
-	secrets.SECRETS = loadedSecrets
-	lumber.Success("loaded secrets")
+	secrets.Load()
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -43,40 +25,12 @@ func main() {
 	r.HandleFunc("/", rootRedirect)
 	r.HandleFunc("/metrics", promhttp.Handler().ServeHTTP)
 
-	githubTokenSource := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: secrets.SECRETS.GitHubAccessToken},
-	)
-	githubHttpClient := oauth2.NewClient(context.Background(), githubTokenSource)
-	githubClient := githubv4.NewClient(githubHttpClient)
-	githubCache := cache.NewCache("github", github.FetchPinnedRepos(githubClient))
-	r.Get("/github/cache", githubCache.ServeHTTP())
-	lumber.Success("setup github cache")
-	go githubCache.StartPeriodicUpdate(func() []github.Repository { return github.FetchPinnedRepos(githubClient) }, 2*time.Minute)
-
-	stravaTokens := strava.LoadTokens()
-	stravaTokens.RefreshIfNeeded()
-	minioClient, err := minio.New(secrets.SECRETS.MinioEndpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4(secrets.SECRETS.MinioAccessKeyID, secrets.SECRETS.MinioSecretKey, ""),
-		Secure: true,
-	})
-	if err != nil {
-		lumber.Fatal(err, "failed to create minio client")
-	}
-	stravaActivities := strava.FetchActivities(*minioClient, stravaTokens)
-	stravaCache := cache.NewCache("strava", stravaActivities)
-	r.Get("/strava/cache", stravaCache.ServeHTTP())
-	r.Post("/strava/event", strava.EventRoute(stravaCache, *minioClient, stravaTokens))
-	r.Get("/strava/event", strava.ChallengeRoute)
-	lumber.Success("setup strava cache")
-
-	games := steam.FetchRecentlyPlayedGames()
-	steamCache := cache.NewCache("steam", games)
-	r.Get("/steam/cache", steamCache.ServeHTTP())
-	lumber.Success("setup steam cache")
-	go steamCache.StartPeriodicUpdate(steam.FetchRecentlyPlayedGames, 10*time.Minute)
+	github.Setup(r)
+	strava.Setup(r)
+	steam.Setup(r)
 
 	lumber.Info("starting server")
-	err = http.ListenAndServe(":8000", r)
+	err := http.ListenAndServe(":8000", r)
 	if err != nil {
 		lumber.Fatal(err, "failed to start router")
 	}

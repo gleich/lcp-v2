@@ -21,7 +21,7 @@ type event struct {
 	Updates        map[string]string `json:"updates"`
 }
 
-func EventRoute(stravaCache *cache.Cache[[]Activity], minioClient minio.Client, tokens Tokens) http.HandlerFunc {
+func eventRoute(stravaCache *cache.Cache[[]activity], minioClient minio.Client, tokens tokens) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 		body, err := io.ReadAll(r.Body)
@@ -43,12 +43,12 @@ func EventRoute(stravaCache *cache.Cache[[]Activity], minioClient minio.Client, 
 			return
 		}
 
-		tokens.RefreshIfNeeded()
-		stravaCache.Update(FetchActivities(minioClient, tokens))
+		tokens.refreshIfNeeded()
+		stravaCache.Update(fetchActivities(minioClient, tokens))
 	})
 }
 
-func ChallengeRoute(w http.ResponseWriter, r *http.Request) {
+func challengeRoute(w http.ResponseWriter, r *http.Request) {
 	verifyToken := r.URL.Query().Get("hub.verify_token")
 	if verifyToken != secrets.SECRETS.StravaVerifyToken {
 		w.WriteHeader(http.StatusUnauthorized)

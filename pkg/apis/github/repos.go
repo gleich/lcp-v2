@@ -9,7 +9,7 @@ import (
 	"github.com/shurcooL/githubv4"
 )
 
-type PinnedItemsQuery struct {
+type pinnedItemsQuery struct {
 	Viewer struct {
 		PinnedItems struct {
 			Nodes []struct {
@@ -34,7 +34,7 @@ type PinnedItemsQuery struct {
 	}
 }
 
-type Repository struct {
+type repository struct {
 	Name          string    `json:"name"`
 	Owner         string    `json:"owner"`
 	Language      string    `json:"language"`
@@ -46,17 +46,17 @@ type Repository struct {
 	URL           string    `json:"url"`
 }
 
-func FetchPinnedRepos(client *githubv4.Client) []Repository {
-	var query PinnedItemsQuery
+func FetchPinnedRepos(client *githubv4.Client) []repository {
+	var query pinnedItemsQuery
 	err := client.Query(context.Background(), &query, nil)
 	if err != nil {
 		lumber.Error(err, "querying github's graphql API failed")
 		return nil
 	}
 
-	var repository []Repository
+	var repositories []repository
 	for _, node := range query.Viewer.PinnedItems.Nodes {
-		repository = append(repository, Repository{
+		repositories = append(repositories, repository{
 			Name:          string(node.Repository.Name),
 			Owner:         string(node.Repository.Owner.Login),
 			Language:      string(node.Repository.PrimaryLanguage.Name),
@@ -68,5 +68,5 @@ func FetchPinnedRepos(client *githubv4.Client) []Repository {
 			URL:           fmt.Sprint(node.Repository.URL.URL),
 		})
 	}
-	return repository
+	return repositories
 }

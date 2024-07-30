@@ -10,7 +10,7 @@ import (
 	"github.com/minio/minio-go/v7"
 )
 
-type Activity struct {
+type activity struct {
 	Name      string    `json:"name"`
 	SportType string    `json:"sport_type"`
 	StartDate time.Time `json:"start_date"`
@@ -37,7 +37,7 @@ type Activity struct {
 	ID                 uint64  `json:"id"`
 }
 
-func FetchActivities(minioClient minio.Client, tokens Tokens) []Activity {
+func fetchActivities(minioClient minio.Client, tokens tokens) []activity {
 	req, err := http.NewRequest("GET", "https://www.strava.com/api/v3/athlete/activities", nil)
 	if err != nil {
 		lumber.Error(err, "Failed to create new request")
@@ -58,7 +58,7 @@ func FetchActivities(minioClient minio.Client, tokens Tokens) []Activity {
 		return nil
 	}
 
-	var activities []Activity
+	var activities []activity
 	err = json.Unmarshal(body, &activities)
 	if err != nil {
 		lumber.Error(err, "failed to parse json")
@@ -69,11 +69,11 @@ func FetchActivities(minioClient minio.Client, tokens Tokens) []Activity {
 	activities = activities[:6]
 
 	for i, activity := range activities {
-		mapData := FetchMap(activity.Map.SummaryPolyline)
-		UploadMap(minioClient, activity.ID, mapData)
-		activities[i].Map.MapBlurImage = MapBlurData(mapData)
+		mapData := fetchMap(activity.Map.SummaryPolyline)
+		uploadMap(minioClient, activity.ID, mapData)
+		activities[i].Map.MapBlurImage = mapBlurData(mapData)
 	}
-	RemoveOldMaps(minioClient, activities)
+	removeOldMaps(minioClient, activities)
 
 	lumber.Success("uploaded", len(activities), "maps to minio")
 

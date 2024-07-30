@@ -13,21 +13,21 @@ import (
 	"github.com/gleich/lumber/v2"
 )
 
-type Tokens struct {
+type tokens struct {
 	Access    string `json:"access_token"`
 	Refresh   string `json:"refresh_token"`
 	ExpiresAt int64  `json:"expires_at"`
 }
 
-func LoadTokens() Tokens {
-	return Tokens{
+func loadTokens() tokens {
+	return tokens{
 		Access:    secrets.SECRETS.StravaAccessToken,
 		Refresh:   secrets.SECRETS.StravaRefreshToken,
 		ExpiresAt: secrets.SECRETS.StravaRefreshTokenExpiration,
 	}
 }
 
-func (t *Tokens) RefreshIfNeeded() {
+func (t *tokens) refreshIfNeeded() {
 	if t.ExpiresAt >= time.Now().Unix() {
 		return
 	}
@@ -61,7 +61,7 @@ func (t *Tokens) RefreshIfNeeded() {
 		return
 	}
 
-	var tokens Tokens
+	var tokens tokens
 	err = json.Unmarshal(body, &tokens)
 	if err != nil {
 		lumber.Error(err, "failed to parse json")

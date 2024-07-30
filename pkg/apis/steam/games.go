@@ -25,7 +25,7 @@ type ownedGamesResponse struct {
 	} `json:"response"`
 }
 
-type Game struct {
+type game struct {
 	Name                string         `json:"name"`
 	AppID               int32          `json:"app_id"`
 	IconURL             string         `json:"icon_url"`
@@ -35,10 +35,10 @@ type Game struct {
 	HeaderURL           string         `json:"header_url"`
 	LibraryURL          *string        `json:"library_url"`
 	AchievementProgress *float32       `json:"achievement_progress"`
-	Achievements        *[]Achievement `json:"achievements"`
+	Achievements        *[]achievement `json:"achievements"`
 }
 
-func FetchRecentlyPlayedGames() []Game {
+func fetchRecentlyPlayedGames() []game {
 	params := url.Values{
 		"key":             {secrets.SECRETS.SteamKey},
 		"steamid":         {secrets.SECRETS.SteamID},
@@ -75,7 +75,7 @@ func FetchRecentlyPlayedGames() []Game {
 	})
 	ownedGames.Response.Games = ownedGames.Response.Games[:10]
 
-	var games []Game
+	var games []game
 	for _, g := range ownedGames.Response.Games {
 		libraryURL := fmt.Sprintf("https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/%d/library_600x900.jpg", g.AppID)
 		libraryImageResponse, err := http.Get(libraryURL)
@@ -90,9 +90,9 @@ func FetchRecentlyPlayedGames() []Game {
 			libraryURLPtr = &libraryURL
 		}
 
-		achievementPercentage, achievements := FetchGameAchievements(g.AppID)
+		achievementPercentage, achievements := fetchGameAchievements(g.AppID)
 
-		games = append(games, Game{
+		games = append(games, game{
 			Name:                g.Name,
 			AppID:               g.AppID,
 			IconURL:             fmt.Sprintf("https://media.steampowered.com/steamcommunity/public/images/apps/%d/%s.jpg", g.AppID, g.ImgIconURL),

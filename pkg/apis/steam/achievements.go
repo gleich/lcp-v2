@@ -36,7 +36,7 @@ type schemaGameResponse struct {
 	} `json:"game"`
 }
 
-type Achievement struct {
+type achievement struct {
 	ApiName     string     `json:"api_name"`
 	Achieved    bool       `json:"achieved"`
 	Icon        string     `json:"icon"`
@@ -45,7 +45,7 @@ type Achievement struct {
 	UnlockTime  *time.Time `json:"unlock_time"`
 }
 
-func FetchGameAchievements(appID int32) (*float32, *[]Achievement) {
+func fetchGameAchievements(appID int32) (*float32, *[]achievement) {
 	params := url.Values{
 		"key":     {secrets.SECRETS.SteamKey},
 		"steamid": {secrets.SECRETS.SteamID},
@@ -114,7 +114,7 @@ func FetchGameAchievements(appID int32) (*float32, *[]Achievement) {
 		return nil, nil
 	}
 
-	var achievements []Achievement
+	var achievements []achievement
 	for _, playerAchievement := range *playerAchievements.PlayerStats.Achievements {
 		for _, schemaAchievement := range gameSchema.Game.GameStats.Achievements {
 			if playerAchievement.ApiName == schemaAchievement.Name {
@@ -122,7 +122,7 @@ func FetchGameAchievements(appID int32) (*float32, *[]Achievement) {
 				if playerAchievement.UnlockTime != nil && *playerAchievement.UnlockTime != 0 {
 					unlockTime = time.Unix(*playerAchievement.UnlockTime, 0)
 				}
-				achievements = append(achievements, Achievement{
+				achievements = append(achievements, achievement{
 					ApiName:     playerAchievement.ApiName,
 					Achieved:    playerAchievement.Achieved == 1,
 					Icon:        schemaAchievement.Icon,
