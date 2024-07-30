@@ -73,7 +73,7 @@ func fetchRecentlyPlayedGames() []game {
 	sort.Slice(ownedGames.Response.Games, func(i, j int) bool {
 		return ownedGames.Response.Games[i].RTimeLastPlayed > ownedGames.Response.Games[j].RTimeLastPlayed
 	})
-	ownedGames.Response.Games = ownedGames.Response.Games[:10]
+	ownedGames.Response.Games = ownedGames.Response.Games[:3]
 
 	var games []game
 	for _, g := range ownedGames.Response.Games {
