@@ -46,7 +46,7 @@ type repository struct {
 	URL           string    `json:"url"`
 }
 
-func FetchPinnedRepos(client *githubv4.Client) []repository {
+func fetchPinnedRepos(client *githubv4.Client) []repository {
 	var query pinnedItemsQuery
 	err := client.Query(context.Background(), &query, nil)
 	if err != nil {

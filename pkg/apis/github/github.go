@@ -18,8 +18,8 @@ func Setup(router *chi.Mux) {
 	)
 	githubHttpClient := oauth2.NewClient(context.Background(), githubTokenSource)
 	githubClient := githubv4.NewClient(githubHttpClient)
-	githubCache := cache.NewCache("github", FetchPinnedRepos(githubClient))
+	githubCache := cache.NewCache("github", fetchPinnedRepos(githubClient))
 	router.Get("/github/cache", githubCache.ServeHTTP())
-	go githubCache.StartPeriodicUpdate(func() []repository { return FetchPinnedRepos(githubClient) }, 2*time.Minute)
+	go githubCache.StartPeriodicUpdate(func() []repository { return fetchPinnedRepos(githubClient) }, 2*time.Minute)
 	lumber.Success("setup github cache")
 }
