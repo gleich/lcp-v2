@@ -1,8 +1,8 @@
 package strava
 
 import (
-	"github.com/gleich/lcp-v2/pkg/cache"
-	"github.com/gleich/lcp-v2/pkg/secrets"
+	"github.com/gleich/lcp-v2/internal/cache"
+	"github.com/gleich/lcp-v2/internal/secrets"
 	"github.com/gleich/lumber/v2"
 	"github.com/go-chi/chi/v5"
 	"github.com/minio/minio-go/v7"

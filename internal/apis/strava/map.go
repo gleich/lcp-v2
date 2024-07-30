@@ -10,7 +10,7 @@ import (
 	"net/url"
 
 	"github.com/buckket/go-blurhash"
-	"github.com/gleich/lcp-v2/pkg/secrets"
+	"github.com/gleich/lcp-v2/internal/secrets"
 	"github.com/gleich/lumber/v2"
 	"github.com/minio/minio-go/v7"
 )

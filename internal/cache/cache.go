@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gleich/lcp-v2/pkg/metrics"
-	"github.com/gleich/lcp-v2/pkg/secrets"
+	"github.com/gleich/lcp-v2/internal/metrics"
+	"github.com/gleich/lcp-v2/internal/secrets"
 	"github.com/gleich/lumber/v2"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"

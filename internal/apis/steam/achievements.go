@@ -9,7 +9,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/gleich/lcp-v2/pkg/secrets"
+	"github.com/gleich/lcp-v2/internal/secrets"
 	"github.com/gleich/lumber/v2"
 )
 

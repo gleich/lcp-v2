@@ -3,10 +3,10 @@ package main
 import (
 	"net/http"
 
-	"github.com/gleich/lcp-v2/pkg/apis/github"
-	"github.com/gleich/lcp-v2/pkg/apis/steam"
-	"github.com/gleich/lcp-v2/pkg/apis/strava"
-	"github.com/gleich/lcp-v2/pkg/secrets"
+	"github.com/gleich/lcp-v2/internal/apis/github"
+	"github.com/gleich/lcp-v2/internal/apis/steam"
+	"github.com/gleich/lcp-v2/internal/apis/strava"
+	"github.com/gleich/lcp-v2/internal/secrets"
 	"github.com/gleich/lumber/v2"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
