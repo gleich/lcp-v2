@@ -66,7 +66,7 @@ func fetchActivities(minioClient minio.Client, tokens tokens) []activity {
 		return nil
 	}
 
-	activities = activities[:6]
+	activities = activities[:3]
 
 	for i, activity := range activities {
 		mapData := fetchMap(activity.Map.SummaryPolyline)
