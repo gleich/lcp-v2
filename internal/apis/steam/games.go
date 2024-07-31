@@ -34,6 +34,8 @@ type game struct {
 	URL                 string         `json:"url"`
 	HeaderURL           string         `json:"header_url"`
 	LibraryURL          *string        `json:"library_url"`
+	LibraryHeroURL      string         `json:"library_hero_url"`
+	LibraryHeroLogoURL  string         `json:"library_hero_logo_url"`
 	AchievementProgress *float32       `json:"achievement_progress"`
 	Achievements        *[]achievement `json:"achievements"`
 }
@@ -101,6 +103,8 @@ func fetchRecentlyPlayedGames() []game {
 			URL:                 fmt.Sprintf("https://store.steampowered.com/app/%d/", g.AppID),
 			HeaderURL:           fmt.Sprintf("https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/%d/header.jpg", g.AppID),
 			LibraryURL:          libraryURLPtr,
+			LibraryHeroURL:      fmt.Sprintf("https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/%d/library_hero.jpg", g.AppID),
+			LibraryHeroLogoURL:  fmt.Sprintf("https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/%d/logo.png", g.AppID),
 			AchievementProgress: achievementPercentage,
 			Achievements:        achievements,
 		})
