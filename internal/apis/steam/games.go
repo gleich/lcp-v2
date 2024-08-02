@@ -40,7 +40,7 @@ type game struct {
 	Achievements        *[]achievement `json:"achievements"`
 }
 
-func fetchRecentlyPlayedGames() []game {
+func fetchRecentlyPlayedGames() ([]game, error) {
 	params := url.Values{
 		"key":             {secrets.SECRETS.SteamKey},
 		"steamid":         {secrets.SECRETS.SteamID},
@@ -50,18 +50,18 @@ func fetchRecentlyPlayedGames() []game {
 	resp, err := http.Get("https://api.steampowered.com/IPlayerService/GetOwnedGames/v1?" + params.Encode())
 	if err != nil {
 		lumber.Error(err, "sending request for owned games failed")
-		return nil
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		lumber.Error(err, "reading response body for owned games failed")
-		return nil
+		return nil, err
 	}
 	if resp.StatusCode != http.StatusOK {
 		lumber.ErrorMsg(resp.StatusCode, "when trying to get owned games", string(body))
-		return nil
+		return nil, err
 	}
 
 	var ownedGames ownedGamesResponse
@@ -69,7 +69,7 @@ func fetchRecentlyPlayedGames() []game {
 	if err != nil {
 		lumber.Error(err, "failed to parse json for owned games")
 		lumber.Debug("body:", string(body))
-		return nil
+		return nil, err
 	}
 
 	sort.Slice(ownedGames.Response.Games, func(i, j int) bool {
@@ -83,7 +83,7 @@ func fetchRecentlyPlayedGames() []game {
 		libraryImageResponse, err := http.Get(libraryURL)
 		if err != nil {
 			lumber.Error(err, "getting library image for", g.Name, "failed")
-			return nil
+			return nil, err
 		}
 		defer libraryImageResponse.Body.Close()
 
@@ -110,5 +110,5 @@ func fetchRecentlyPlayedGames() []game {
 		})
 	}
 
-	return games
+	return games, nil
 }

@@ -18,8 +18,14 @@ func Setup(router *chi.Mux) {
 	)
 	githubHttpClient := oauth2.NewClient(context.Background(), githubTokenSource)
 	githubClient := githubv4.NewClient(githubHttpClient)
-	githubCache := cache.NewCache("github", fetchPinnedRepos(githubClient))
+
+	pinnedRepos, err := fetchPinnedRepos(githubClient)
+	if err != nil {
+		lumber.Fatal(err, "fetching initial pinned repos failed")
+	}
+
+	githubCache := cache.NewCache("github", pinnedRepos)
 	router.Get("/github/cache", githubCache.ServeHTTP())
-	go githubCache.StartPeriodicUpdate(func() []repository { return fetchPinnedRepos(githubClient) }, 2*time.Minute)
+	go githubCache.StartPeriodicUpdate(func() ([]repository, error) { return fetchPinnedRepos(githubClient) }, 2*time.Minute)
 	lumber.Success("setup github cache")
 }

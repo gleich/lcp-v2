@@ -46,12 +46,12 @@ type repository struct {
 	URL           string    `json:"url"`
 }
 
-func fetchPinnedRepos(client *githubv4.Client) []repository {
+func fetchPinnedRepos(client *githubv4.Client) ([]repository, error) {
 	var query pinnedItemsQuery
 	err := client.Query(context.Background(), &query, nil)
 	if err != nil {
 		lumber.Error(err, "querying github's graphql API failed")
-		return nil
+		return nil, err
 	}
 
 	var repositories []repository
@@ -68,5 +68,5 @@ func fetchPinnedRepos(client *githubv4.Client) []repository {
 			URL:           fmt.Sprint(node.Repository.URL.URL),
 		})
 	}
-	return repositories
+	return repositories, nil
 }

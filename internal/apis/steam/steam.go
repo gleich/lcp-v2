@@ -9,7 +9,11 @@ import (
 )
 
 func Setup(router *chi.Mux) {
-	games := fetchRecentlyPlayedGames()
+	games, err := fetchRecentlyPlayedGames()
+	if err != nil {
+		lumber.Fatal(err, "initial fetch of games failed")
+	}
+
 	steamCache := cache.NewCache("steam", games)
 	router.Get("/steam/cache", steamCache.ServeHTTP())
 	go steamCache.StartPeriodicUpdate(fetchRecentlyPlayedGames, 5*time.Minute)

@@ -94,10 +94,15 @@ func (c *Cache[T]) Update(data T) {
 	}
 }
 
-func (c *Cache[T]) StartPeriodicUpdate(updateFunc func() T, interval time.Duration) {
+func (c *Cache[T]) StartPeriodicUpdate(updateFunc func() (T, error), interval time.Duration) {
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
 	for range ticker.C {
-		c.Update(updateFunc())
+		data, err := updateFunc()
+		if err != nil {
+			lumber.ErrorMsg("updating cache", c.Name, "failed")
+			continue
+		}
+		c.Update(data)
 	}
 }
