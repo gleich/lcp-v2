@@ -52,7 +52,9 @@ func fetchGameAchievements(appID int32) (*float32, *[]achievement) {
 		"appid":   {fmt.Sprint(appID)},
 		"format":  {"json"},
 	}
-	resp, err := http.Get("https://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001?" + params.Encode())
+	resp, err := http.Get(
+		"https://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001?" + params.Encode(),
+	)
 	if err != nil {
 		lumber.Error(err, "sending request for player achievements from", appID, "failed")
 		return nil, nil
@@ -68,7 +70,12 @@ func fetchGameAchievements(appID int32) (*float32, *[]achievement) {
 		return nil, nil
 	}
 	if resp.StatusCode != http.StatusOK {
-		lumber.ErrorMsg(resp.StatusCode, "when trying to get player achievements for", appID, string(body))
+		lumber.ErrorMsg(
+			resp.StatusCode,
+			"when trying to get player achievements for",
+			appID,
+			string(body),
+		)
 		return nil, nil
 	}
 
@@ -89,7 +96,9 @@ func fetchGameAchievements(appID int32) (*float32, *[]achievement) {
 		"appid":  {fmt.Sprint(appID)},
 		"format": {"json"},
 	}
-	resp, err = http.Get("https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2?" + params.Encode())
+	resp, err = http.Get(
+		"https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2?" + params.Encode(),
+	)
 	if err != nil {
 		lumber.Error(err, "sending request for owned games failed")
 		return nil, nil
@@ -102,7 +111,12 @@ func fetchGameAchievements(appID int32) (*float32, *[]achievement) {
 		return nil, nil
 	}
 	if resp.StatusCode != http.StatusOK {
-		lumber.ErrorMsg(resp.StatusCode, "when trying to get player achievements for", appID, string(body))
+		lumber.ErrorMsg(
+			resp.StatusCode,
+			"when trying to get player achievements for",
+			appID,
+			string(body),
+		)
 		return nil, nil
 	}
 

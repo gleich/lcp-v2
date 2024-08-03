@@ -21,7 +21,11 @@ type event struct {
 	Updates        map[string]string `json:"updates"`
 }
 
-func eventRoute(stravaCache *cache.Cache[[]activity], minioClient minio.Client, tokens tokens) http.HandlerFunc {
+func eventRoute(
+	stravaCache *cache.Cache[[]activity],
+	minioClient minio.Client,
+	tokens tokens,
+) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 		body, err := io.ReadAll(r.Body)

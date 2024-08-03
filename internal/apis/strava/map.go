@@ -27,7 +27,11 @@ func fetchMap(polyline string) []byte {
 	)
 	url := fmt.Sprintf(
 		"https://api.mapbox.com/styles/v1/mattgleich/clxxsfdfm002401qj7jcxh47e/static/path-%f+%s(%s)/auto/%dx%d@2x?"+params.Encode(),
-		lineWidth, lineColor, url.QueryEscape(polyline), width, height,
+		lineWidth,
+		lineColor,
+		url.QueryEscape(polyline),
+		width,
+		height,
 	)
 	resp, err := http.Get(url)
 	if err != nil {
@@ -73,7 +77,9 @@ func mapBlurData(data []byte) *string {
 		lumber.Error(err, "creating png based off blurred image failed")
 		return nil
 	}
-	blurDataURI := "data:image/png;base64," + base64.StdEncoding.EncodeToString(blurImageBuffer.Bytes())
+	blurDataURI := "data:image/png;base64," + base64.StdEncoding.EncodeToString(
+		blurImageBuffer.Bytes(),
+	)
 	return &blurDataURI
 }
 
@@ -113,7 +119,12 @@ func removeOldMaps(minioClient minio.Client, activities []activity) {
 			}
 		}
 		if !validObject {
-			err := minioClient.RemoveObject(context.Background(), bucketName, object.Key, minio.RemoveObjectOptions{})
+			err := minioClient.RemoveObject(
+				context.Background(),
+				bucketName,
+				object.Key,
+				minio.RemoveObjectOptions{},
+			)
 			if err != nil {
 				lumber.Error(err, "failed to remove object")
 				return

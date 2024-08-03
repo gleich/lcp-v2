@@ -13,7 +13,11 @@ func Setup(router *chi.Mux) {
 	stravaTokens := loadTokens()
 	stravaTokens.refreshIfNeeded()
 	minioClient, err := minio.New(secrets.SECRETS.MinioEndpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4(secrets.SECRETS.MinioAccessKeyID, secrets.SECRETS.MinioSecretKey, ""),
+		Creds: credentials.NewStaticV4(
+			secrets.SECRETS.MinioAccessKeyID,
+			secrets.SECRETS.MinioSecretKey,
+			"",
+		),
 		Secure: true,
 	})
 	if err != nil {
