@@ -36,5 +36,5 @@ func main() {
 }
 
 func rootRedirect(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, "https://mattglei.ch", http.StatusTemporaryRedirect)
+	http.Redirect(w, r, "https://mattglei.ch/lcp", http.StatusTemporaryRedirect)
 }
