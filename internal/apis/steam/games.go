@@ -77,10 +77,15 @@ func fetchRecentlyPlayedGames() ([]game, error) {
 	sort.Slice(ownedGames.Response.Games, func(i, j int) bool {
 		return ownedGames.Response.Games[i].RTimeLastPlayed > ownedGames.Response.Games[j].RTimeLastPlayed
 	})
-	ownedGames.Response.Games = ownedGames.Response.Games[:3]
 
 	var games []game
-	for _, g := range ownedGames.Response.Games {
+	i := 0
+	for len(games) < 3 {
+		if i > len(games) {
+			break
+		}
+		g := ownedGames.Response.Games[i]
+		i++
 		libraryURL := fmt.Sprintf(
 			"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/%d/library_600x900.jpg",
 			g.AppID,
@@ -126,6 +131,7 @@ func fetchRecentlyPlayedGames() ([]game, error) {
 			AchievementProgress: achievementPercentage,
 			Achievements:        achievements,
 		})
+
 	}
 
 	return games, nil
