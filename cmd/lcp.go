@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gleich/lcp-v2/internal/apis/github"
 	"github.com/gleich/lcp-v2/internal/apis/steam"
@@ -14,6 +15,7 @@ import (
 )
 
 func main() {
+	setupLogger()
 	lumber.Info("booted")
 
 	secrets.Load()
@@ -33,6 +35,16 @@ func main() {
 	if err != nil {
 		lumber.Fatal(err, "failed to start router")
 	}
+}
+
+func setupLogger() {
+	logger := lumber.NewCustomLogger()
+	nytime, err := time.LoadLocation("America/New_York")
+	if err != nil {
+		lumber.Fatal(err, "failed to load new york timezone")
+	}
+	logger.Timezone = nytime
+	lumber.SetLogger(logger)
 }
 
 func rootRedirect(w http.ResponseWriter, r *http.Request) {
