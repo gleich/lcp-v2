@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -90,7 +91,7 @@ func (c *Cache[T]) Update(data T) {
 		c.updateCounter.Inc()
 		metrics.CacheUpdates.Inc()
 		c.persistToFile()
-		lumber.Success(c.Name, "cache updated")
+		lumber.Success(strings.ToUpper(c.Name), "cache updated")
 	}
 }
 
