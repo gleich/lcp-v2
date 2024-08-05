@@ -75,7 +75,5 @@ func fetchActivities(minioClient minio.Client, tokens tokens) []activity {
 	}
 	removeOldMaps(minioClient, activities)
 
-	lumber.Success("uploaded", len(activities), "maps to minio")
-
 	return activities
 }
