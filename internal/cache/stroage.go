@@ -8,7 +8,7 @@ import (
 	"github.com/gleich/lumber/v2"
 )
 
-const cacheFolder = "/caches/"
+const cacheFolder = "/Users/matt/Desktop/caches/"
 
 func (c *Cache[T]) persistToFile() {
 	var file *os.File
