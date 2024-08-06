@@ -2,6 +2,7 @@ package steam
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -63,7 +64,7 @@ func fetchRecentlyPlayedGames() ([]game, error) {
 	}
 	if resp.StatusCode != http.StatusOK {
 		lumber.ErrorMsg(resp.StatusCode, "when trying to get owned games", string(body))
-		return nil, err
+		return nil, errors.New(fmt.Sprintf("%d status code\n", resp.StatusCode))
 	}
 
 	var ownedGames ownedGamesResponse
