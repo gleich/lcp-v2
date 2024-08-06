@@ -2,6 +2,7 @@ package strava
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -42,6 +43,7 @@ type activity struct {
 	StartDate          time.Time `json:"start_date"`
 	Timezone           string    `json:"timezone"`
 	MapBlurImage       *string   `json:"map_blur_image"`
+	MapImageURL        *string   `json:"map_image_url"`
 	HasMap             bool      `json:"has_map"`
 	TotalElevationGain float32   `json:"total_elevation_gain"`
 	MovingTime         uint32    `json:"moving_time"`
@@ -103,6 +105,11 @@ func fetchActivities(minioClient minio.Client, tokens tokens) []activity {
 			mapData := fetchMap(stravaActivity.Map.SummaryPolyline)
 			uploadMap(minioClient, stravaActivity.ID, mapData)
 			a.MapBlurImage = mapBlurData(mapData)
+			imgurl := fmt.Sprintf(
+				"https://minio-api.dev.mattglei.ch/mapbox-maps/%d.png",
+				a.ID,
+			)
+			a.MapImageURL = &imgurl
 		}
 		activities = append(activities, a)
 	}
