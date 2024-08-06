@@ -100,7 +100,7 @@ func uploadMap(minioClient minio.Client, id uint64, data []byte) {
 	}
 }
 
-func removeOldMaps(minioClient minio.Client, activities []activity) {
+func removeOldMaps(minioClient minio.Client, activities []stravaActivity) {
 	var validKeys []string
 	for _, activity := range activities {
 		validKeys = append(validKeys, fmt.Sprintf("%d.png", activity.ID))

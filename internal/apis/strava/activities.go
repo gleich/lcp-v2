@@ -10,14 +10,13 @@ import (
 	"github.com/minio/minio-go/v7"
 )
 
-type activity struct {
+type stravaActivity struct {
 	Name      string    `json:"name"`
 	SportType string    `json:"sport_type"`
 	StartDate time.Time `json:"start_date"`
 	Timezone  string    `json:"timezone"`
 	Map       struct {
-		SummaryPolyline string  `json:"summary_polyline"`
-		MapBlurImage    *string `json:"map_blur_image"`
+		SummaryPolyline string `json:"summary_polyline"`
 	} `json:"map"`
 	Trainer            bool    `json:"trainer"`
 	Commute            bool    `json:"commute"`
@@ -35,6 +34,19 @@ type activity struct {
 	PrCount            uint32  `json:"pr_count"`
 	Distance           float32 `json:"distance"`
 	ID                 uint64  `json:"id"`
+}
+
+type activity struct {
+	Name               string    `json:"name"`
+	SportType          string    `json:"sport_type"`
+	StartDate          time.Time `json:"start_date"`
+	Timezone           string    `json:"timezone"`
+	MapBlurImage       *string   `json:"map_blur_image"`
+	HasMap             bool      `json:"has_map"`
+	TotalElevationGain float32   `json:"total_elevation_gain"`
+	MovingTime         uint32    `json:"moving_time"`
+	Distance           float32   `json:"distance"`
+	ID                 uint64    `json:"id"`
 }
 
 func fetchActivities(minioClient minio.Client, tokens tokens) []activity {
@@ -58,22 +70,37 @@ func fetchActivities(minioClient minio.Client, tokens tokens) []activity {
 		return nil
 	}
 
-	var activities []activity
-	err = json.Unmarshal(body, &activities)
+	var stravaActivities []stravaActivity
+	err = json.Unmarshal(body, &stravaActivities)
 	if err != nil {
 		lumber.Error(err, "failed to parse json")
 		lumber.Debug(string(body))
 		return nil
 	}
 
-	activities = activities[:3]
+	stravaActivities = stravaActivities[:3]
 
-	for i, activity := range activities {
-		mapData := fetchMap(activity.Map.SummaryPolyline)
-		uploadMap(minioClient, activity.ID, mapData)
-		activities[i].Map.MapBlurImage = mapBlurData(mapData)
+	var activities []activity
+	for _, stravaActivity := range stravaActivities {
+		a := activity{
+			Name:               stravaActivity.Name,
+			SportType:          stravaActivity.SportType,
+			StartDate:          stravaActivity.StartDate,
+			Timezone:           stravaActivity.Timezone,
+			TotalElevationGain: stravaActivity.TotalElevationGain,
+			MovingTime:         stravaActivity.MovingTime,
+			Distance:           stravaActivity.Distance,
+			ID:                 stravaActivity.ID,
+			HasMap:             stravaActivity.Map.SummaryPolyline != "",
+		}
+		if a.HasMap {
+			mapData := fetchMap(stravaActivity.Map.SummaryPolyline)
+			uploadMap(minioClient, stravaActivity.ID, mapData)
+			a.MapBlurImage = mapBlurData(mapData)
+		}
+		activities = append(activities, a)
 	}
-	removeOldMaps(minioClient, activities)
+	removeOldMaps(minioClient, stravaActivities)
 
 	return activities
 }
