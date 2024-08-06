@@ -37,7 +37,7 @@ func NewCache[T any](name string, data T) *Cache[T] {
 			Name: fmt.Sprintf("cache_%s_requests", name),
 			Help: fmt.Sprintf(`The total number of times the cache "%s" has been requested`, name),
 		}),
-		filePath: filepath.Join(cacheFolder, fmt.Sprintf("%s.json", name)),
+		filePath: filepath.Join(secrets.SECRETS.CacheFolder, fmt.Sprintf("%s.json", name)),
 	}
 	cache.loadFromFile()
 	cache.Update(data)

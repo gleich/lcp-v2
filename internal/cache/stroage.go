@@ -8,8 +8,6 @@ import (
 	"github.com/gleich/lumber/v2"
 )
 
-const cacheFolder = "/caches/"
-
 func (c *Cache[T]) persistToFile() {
 	var file *os.File
 	if _, err := os.Stat(c.filePath); os.IsNotExist(err) {
