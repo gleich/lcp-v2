@@ -132,7 +132,7 @@ func fetchHeartrate(id uint64, tokens tokens) []int {
 	params := url.Values{
 		"key_by_type": {"true"},
 		"keys":        {"heartrate"},
-		"resolution":  {"medium"},
+		"resolution":  {"low"},
 	}
 	req, err := http.NewRequest(
 		"GET",
