@@ -78,10 +78,14 @@ func fetchActivities(minioClient minio.Client, tokens tokens) []activity {
 		return nil
 	}
 
-	stravaActivities = stravaActivities[:3]
-
 	var activities []activity
 	for _, stravaActivity := range stravaActivities {
+		if len(activities) < 3 {
+			break
+		}
+		if stravaActivity.Private {
+			continue
+		}
 		a := activity{
 			Name:               stravaActivity.Name,
 			SportType:          stravaActivity.SportType,
