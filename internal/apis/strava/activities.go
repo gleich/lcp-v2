@@ -47,6 +47,7 @@ type activity struct {
 	MovingTime         uint32    `json:"moving_time"`
 	Distance           float32   `json:"distance"`
 	ID                 uint64    `json:"id"`
+	AverageHeartrate   float32   `json:"average_heartrate"`
 }
 
 func fetchActivities(minioClient minio.Client, tokens tokens) []activity {
@@ -95,6 +96,7 @@ func fetchActivities(minioClient minio.Client, tokens tokens) []activity {
 			MovingTime:         stravaActivity.MovingTime,
 			Distance:           stravaActivity.Distance,
 			ID:                 stravaActivity.ID,
+			AverageHeartrate:   stravaActivity.AverageHeartrate,
 			HasMap:             stravaActivity.Map.SummaryPolyline != "",
 		}
 		if a.HasMap {
