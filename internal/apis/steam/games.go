@@ -62,8 +62,11 @@ func fetchRecentlyPlayedGames() ([]game, error) {
 		return nil, err
 	}
 	if resp.StatusCode != http.StatusOK {
-		lumber.ErrorMsg(resp.StatusCode, "when trying to get owned games", string(body))
-		return nil, fmt.Errorf("%d status code\n", resp.StatusCode)
+		return nil, fmt.Errorf(
+			"%d status code when trying to get owned games: %s\n",
+			resp.StatusCode,
+			string(body),
+		)
 	}
 
 	var ownedGames ownedGamesResponse
