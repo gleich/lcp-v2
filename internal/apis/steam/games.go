@@ -81,7 +81,7 @@ func fetchRecentlyPlayedGames() ([]game, error) {
 
 	var games []game
 	i := 0
-	for len(games) < 3 {
+	for len(games) < 10 {
 		if i > len(games) {
 			break
 		}

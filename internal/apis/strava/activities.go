@@ -92,7 +92,7 @@ func fetchActivities(minioClient minio.Client, tokens tokens) []activity {
 
 	var activities []activity
 	for _, stravaActivity := range stravaActivities {
-		if len(activities) >= 3 {
+		if len(activities) >= 10 {
 			break
 		}
 		if stravaActivity.Private {
