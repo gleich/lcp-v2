@@ -45,8 +45,6 @@ func (c *Cache[T]) persistToFile() {
 	}
 }
 
-// Load the cache from the persistent cache file
-// returns if the cache was able to be loaded or not
 func (c *Cache[T]) loadFromFile() {
 	if _, err := os.Stat(c.filePath); !os.IsNotExist(err) {
 		b, err := os.ReadFile(c.filePath)
