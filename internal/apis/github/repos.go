@@ -22,12 +22,11 @@ type pinnedItemsQuery struct {
 						Name  githubv4.String
 						Color githubv4.String
 					}
-					Description    githubv4.String
-					UpdatedAt      githubv4.DateTime
-					StargazerCount githubv4.Int
-					IsPrivate      githubv4.Boolean
-					ID             githubv4.ID
-					URL            githubv4.URI
+					Description githubv4.String
+					UpdatedAt   githubv4.DateTime
+					IsPrivate   githubv4.Boolean
+					ID          githubv4.ID
+					URL         githubv4.URI
 				} `graphql:"... on Repository"`
 			}
 		} `graphql:"pinnedItems(first: 6, types: REPOSITORY)"`
@@ -41,7 +40,6 @@ type repository struct {
 	LanguageColor string    `json:"language_color"`
 	Description   string    `json:"description"`
 	UpdatedAt     time.Time `json:"updated_at"`
-	Stargazers    int32     `json:"stargazers"`
 	ID            string    `json:"id"`
 	URL           string    `json:"url"`
 }
@@ -63,7 +61,6 @@ func fetchPinnedRepos(client *githubv4.Client) ([]repository, error) {
 			LanguageColor: string(node.Repository.PrimaryLanguage.Color),
 			Description:   string(node.Repository.Description),
 			UpdatedAt:     node.Repository.UpdatedAt.Time,
-			Stargazers:    int32(node.Repository.StargazerCount),
 			ID:            fmt.Sprint(node.Repository.ID),
 			URL:           fmt.Sprint(node.Repository.URL.URL),
 		})
