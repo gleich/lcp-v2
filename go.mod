@@ -4,7 +4,7 @@ go 1.22.6
 
 require (
 	github.com/buckket/go-blurhash v1.1.0
-	github.com/caarlos0/env/v11 v11.2.0
+	github.com/caarlos0/env/v11 v11.2.2
 	github.com/gleich/lumber/v2 v2.3.0
 	github.com/go-chi/chi/v5 v5.1.0
 	github.com/joho/godotenv v1.5.1
@@ -35,9 +35,9 @@ require (
 	github.com/rs/xid v1.5.0 // indirect
 	github.com/shurcooL/graphql v0.0.0-20230722043721-ed46e5a46466 // indirect
 	github.com/wayneashleyberry/truecolor v1.0.1 // indirect
-	golang.org/x/crypto v0.25.0 // indirect
-	golang.org/x/net v0.27.0 // indirect
-	golang.org/x/sys v0.23.0 // indirect
-	golang.org/x/text v0.16.0 // indirect
+	golang.org/x/crypto v0.26.0 // indirect
+	golang.org/x/net v0.28.0 // indirect
+	golang.org/x/sys v0.24.0 // indirect
+	golang.org/x/text v0.17.0 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
 )
