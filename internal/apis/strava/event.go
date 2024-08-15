@@ -48,7 +48,12 @@ func eventRoute(
 		}
 
 		tokens.refreshIfNeeded()
-		stravaCache.Update(fetchActivities(minioClient, tokens))
+		activities, err := fetchActivities(minioClient, tokens)
+		if err != nil {
+			lumber.ErrorMsg("failed to update strava cache")
+			return
+		}
+		stravaCache.Update(activities)
 	})
 }
 

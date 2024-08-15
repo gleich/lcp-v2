@@ -61,25 +61,25 @@ type activity struct {
 	HeartrateData      []int     `json:"heartrate_data"`
 }
 
-func fetchActivities(minioClient minio.Client, tokens tokens) []activity {
+func fetchActivities(minioClient minio.Client, tokens tokens) ([]activity, error) {
 	req, err := http.NewRequest("GET", "https://www.strava.com/api/v3/athlete/activities", nil)
 	if err != nil {
 		lumber.Error(err, "creating request failed")
-		return nil
+		return nil, err
 	}
 	req.Header.Set("Authorization", "Bearer "+tokens.Access)
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		lumber.Error(err, "sending request for Strava activities failed")
-		return nil
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		lumber.Error(err, "reading response body failed")
-		return nil
+		return nil, err
 	}
 
 	var stravaActivities []stravaActivity
@@ -87,7 +87,7 @@ func fetchActivities(minioClient minio.Client, tokens tokens) []activity {
 	if err != nil {
 		lumber.Error(err, "failed to parse json")
 		lumber.Debug(string(body))
-		return nil
+		return nil, err
 	}
 
 	var activities []activity
@@ -125,7 +125,7 @@ func fetchActivities(minioClient minio.Client, tokens tokens) []activity {
 	}
 	removeOldMaps(minioClient, stravaActivities)
 
-	return activities
+	return activities, nil
 }
 
 func fetchHeartrate(id uint64, tokens tokens) []int {

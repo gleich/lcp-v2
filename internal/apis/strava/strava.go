@@ -23,7 +23,10 @@ func Setup(router *chi.Mux) {
 	if err != nil {
 		lumber.Fatal(err, "failed to create minio client")
 	}
-	stravaActivities := fetchActivities(*minioClient, stravaTokens)
+	stravaActivities, err := fetchActivities(*minioClient, stravaTokens)
+	if err != nil {
+		lumber.ErrorMsg("failed to load initial data for strava cache; not updating")
+	}
 	stravaCache := cache.NewCache("strava", stravaActivities)
 	router.Get("/strava/cache", stravaCache.ServeHTTP())
 	router.Post("/strava/event", eventRoute(stravaCache, *minioClient, stravaTokens))
