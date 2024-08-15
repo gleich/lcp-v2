@@ -101,24 +101,20 @@ func uploadMap(minioClient minio.Client, id uint64, data []byte) {
 }
 
 func removeOldMaps(minioClient minio.Client, activities []stravaActivity) {
-	var validKeys []string
+	validKeys := make(map[string]struct{})
 	for _, activity := range activities {
-		validKeys = append(validKeys, fmt.Sprintf("%d.png", activity.ID))
+		key := fmt.Sprintf("%d.png", activity.ID)
+		validKeys[key] = struct{}{}
 	}
 
 	objects := minioClient.ListObjects(context.Background(), bucketName, minio.ListObjectsOptions{})
 	for object := range objects {
 		if object.Err != nil {
 			lumber.Error(object.Err, "failed to load object")
-			return
+			continue
 		}
-		var validObject bool
-		for _, key := range validKeys {
-			if object.Key == key {
-				validObject = true
-			}
-		}
-		if !validObject {
+
+		if _, exists := validKeys[object.Key]; !exists {
 			err := minioClient.RemoveObject(
 				context.Background(),
 				bucketName,
@@ -127,7 +123,7 @@ func removeOldMaps(minioClient minio.Client, activities []stravaActivity) {
 			)
 			if err != nil {
 				lumber.Error(err, "failed to remove object")
-				return
+				continue
 			}
 		}
 	}
