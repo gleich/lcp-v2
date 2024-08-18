@@ -1,6 +1,6 @@
 module github.com/gleich/lcp-v2
 
-go 1.22.6
+go 1.23
 
 require (
 	github.com/buckket/go-blurhash v1.1.0
