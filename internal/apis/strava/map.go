@@ -8,6 +8,7 @@ import (
 	"image/png"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/buckket/go-blurhash"
 	"github.com/gleich/lcp-v2/internal/secrets"
@@ -101,20 +102,24 @@ func uploadMap(minioClient minio.Client, id uint64, data []byte) {
 }
 
 func removeOldMaps(minioClient minio.Client, activities []stravaActivity) {
-	validKeys := make(map[string]struct{})
+	var validKeys []string
 	for _, activity := range activities {
-		key := fmt.Sprintf("%d.png", activity.ID)
-		validKeys[key] = struct{}{}
+		validKeys = append(validKeys, fmt.Sprintf("%d.png", activity.ID))
 	}
 
 	objects := minioClient.ListObjects(context.Background(), bucketName, minio.ListObjectsOptions{})
 	for object := range objects {
 		if object.Err != nil {
 			lumber.Error(object.Err, "failed to load object")
-			continue
+			return
 		}
-
-		if _, exists := validKeys[object.Key]; !exists {
+		var validObject bool
+		for _, validKey := range validKeys {
+			if strings.Contains(object.Key, validKey) {
+				validObject = true
+			}
+		}
+		if !validObject {
 			err := minioClient.RemoveObject(
 				context.Background(),
 				bucketName,
@@ -123,7 +128,7 @@ func removeOldMaps(minioClient minio.Client, activities []stravaActivity) {
 			)
 			if err != nil {
 				lumber.Error(err, "failed to remove object")
-				continue
+				return
 			}
 		}
 	}
