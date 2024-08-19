@@ -123,7 +123,7 @@ func fetchActivities(minioClient minio.Client, tokens tokens) ([]activity, error
 		}
 		activities = append(activities, a)
 	}
-	removeOldMaps(minioClient, stravaActivities)
+	removeOldMaps(minioClient, activities)
 
 	return activities, nil
 }
