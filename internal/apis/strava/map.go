@@ -112,23 +112,19 @@ func removeOldMaps(minioClient minio.Client, activities []activity) {
 			lumber.Error(object.Err, "failed to load object")
 			return
 		}
-		var validObject bool
 		for _, validKey := range validKeys {
 			if validKey == object.Key {
-				validObject = true
+				err := minioClient.RemoveObject(
+					context.Background(),
+					bucketName,
+					object.Key,
+					minio.RemoveObjectOptions{},
+				)
+				if err != nil {
+					lumber.Error(err, "failed to remove object")
+					return
+				}
 				break
-			}
-		}
-		if !validObject {
-			err := minioClient.RemoveObject(
-				context.Background(),
-				bucketName,
-				object.Key,
-				minio.RemoveObjectOptions{},
-			)
-			if err != nil {
-				lumber.Error(err, "failed to remove object")
-				return
 			}
 		}
 	}
