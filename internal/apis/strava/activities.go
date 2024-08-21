@@ -8,7 +8,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/gleich/lumber/v2"
+	"github.com/gleich/lumber/v3"
 	"github.com/minio/minio-go/v7"
 )
 

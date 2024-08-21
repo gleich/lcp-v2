@@ -3,7 +3,7 @@ package strava
 import (
 	"github.com/gleich/lcp-v2/internal/cache"
 	"github.com/gleich/lcp-v2/internal/secrets"
-	"github.com/gleich/lumber/v2"
+	"github.com/gleich/lumber/v3"
 	"github.com/go-chi/chi/v5"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
@@ -32,5 +32,5 @@ func Setup(router *chi.Mux) {
 	router.Post("/strava/event", eventRoute(stravaCache, *minioClient, stravaTokens))
 	router.Get("/strava/event", challengeRoute)
 
-	lumber.Success("setup strava cache")
+	lumber.Done("setup strava cache")
 }

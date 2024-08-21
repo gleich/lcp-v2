@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/gleich/lcp-v2/internal/secrets"
-	"github.com/gleich/lumber/v2"
+	"github.com/gleich/lumber/v3"
 )
 
 type tokens struct {
@@ -74,7 +74,7 @@ func (t *tokens) refreshIfNeeded() {
 	os.Setenv("STRAVA_REFRESH_TOKEN_EXPIRATION", strconv.FormatInt(tokens.ExpiresAt, 10))
 	*t = tokens
 
-	lumber.Success("loaded new strava token data")
+	lumber.Done("loaded new strava token data")
 	lumber.Info("strava access token:", t.Access)
 	lumber.Info("strava refresh token:", t.Refresh)
 }

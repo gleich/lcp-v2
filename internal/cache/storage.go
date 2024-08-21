@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/gleich/lumber/v2"
+	"github.com/gleich/lumber/v3"
 )
 
 func (c *Cache[T]) persistToFile() {

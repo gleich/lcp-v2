@@ -2,7 +2,7 @@ package secrets
 
 import (
 	"github.com/caarlos0/env/v11"
-	"github.com/gleich/lumber/v2"
+	"github.com/gleich/lumber/v3"
 	"github.com/joho/godotenv"
 )
 
@@ -41,5 +41,5 @@ func Load() {
 		lumber.Fatal(err, "parsing required env vars failed")
 	}
 	SECRETS = loadedSecrets
-	lumber.Success("loaded secrets")
+	lumber.Done("loaded secrets")
 }

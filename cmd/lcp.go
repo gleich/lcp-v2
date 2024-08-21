@@ -8,7 +8,7 @@ import (
 	"github.com/gleich/lcp-v2/internal/apis/steam"
 	"github.com/gleich/lcp-v2/internal/apis/strava"
 	"github.com/gleich/lcp-v2/internal/secrets"
-	"github.com/gleich/lumber/v2"
+	"github.com/gleich/lumber/v3"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -38,13 +38,11 @@ func main() {
 }
 
 func setupLogger() {
-	logger := lumber.NewCustomLogger()
 	nytime, err := time.LoadLocation("America/New_York")
 	if err != nil {
 		lumber.Fatal(err, "failed to load new york timezone")
 	}
-	logger.Timezone = nytime
-	lumber.SetLogger(logger)
+	lumber.SetTimezone(nytime)
 }
 
 func rootRedirect(w http.ResponseWriter, r *http.Request) {

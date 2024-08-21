@@ -11,7 +11,7 @@ import (
 
 	"github.com/gleich/lcp-v2/internal/metrics"
 	"github.com/gleich/lcp-v2/internal/secrets"
-	"github.com/gleich/lumber/v2"
+	"github.com/gleich/lumber/v3"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 )
@@ -91,7 +91,7 @@ func (c *Cache[T]) Update(data T) {
 		c.updateCounter.Inc()
 		metrics.CacheUpdates.Inc()
 		c.persistToFile()
-		lumber.Success(strings.ToUpper(c.Name), "cache updated")
+		lumber.Done(strings.ToUpper(c.Name), "cache updated")
 	}
 }
 

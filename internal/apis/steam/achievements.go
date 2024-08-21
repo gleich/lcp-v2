@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/gleich/lcp-v2/internal/secrets"
-	"github.com/gleich/lumber/v2"
+	"github.com/gleich/lumber/v3"
 )
 
 type playerAchievementsResponse struct {

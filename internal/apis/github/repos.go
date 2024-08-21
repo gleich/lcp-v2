@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gleich/lumber/v2"
+	"github.com/gleich/lumber/v3"
 	"github.com/shurcooL/githubv4"
 )
 

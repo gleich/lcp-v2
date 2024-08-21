@@ -7,7 +7,7 @@ import (
 
 	"github.com/gleich/lcp-v2/internal/cache"
 	"github.com/gleich/lcp-v2/internal/secrets"
-	"github.com/gleich/lumber/v2"
+	"github.com/gleich/lumber/v3"
 	"github.com/minio/minio-go/v7"
 )
 
