@@ -43,6 +43,7 @@ func setupLogger() {
 		lumber.Fatal(err, "failed to load new york timezone")
 	}
 	lumber.SetTimezone(nytime)
+	lumber.SetTimeFormat("01/02/2006 03:04:05 PM MST")
 }
 
 func rootRedirect(w http.ResponseWriter, r *http.Request) {
