@@ -74,7 +74,5 @@ func (t *tokens) refreshIfNeeded() {
 	os.Setenv("STRAVA_REFRESH_TOKEN_EXPIRATION", strconv.FormatInt(tokens.ExpiresAt, 10))
 	*t = tokens
 
-	lumber.Done("loaded new strava token data")
-	lumber.Info("strava access token:", t.Access)
-	lumber.Info("strava refresh token:", t.Refresh)
+	lumber.Done("loaded new strava access token:", t.Access)
 }
