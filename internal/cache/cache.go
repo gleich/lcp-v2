@@ -17,7 +17,7 @@ import (
 )
 
 type Cache[T any] struct {
-	Name           string
+	name           string
 	mutex          sync.RWMutex
 	data           T
 	updated        time.Time
@@ -28,7 +28,7 @@ type Cache[T any] struct {
 
 func NewCache[T any](name string, data T) *Cache[T] {
 	cache := Cache[T]{
-		Name: name,
+		name: name,
 		updateCounter: promauto.NewCounter(prometheus.CounterOpts{
 			Name: fmt.Sprintf("cache_%s_updates", name),
 			Help: fmt.Sprintf(`The total number of times the cache "%s" has been updated`, name),
@@ -91,7 +91,7 @@ func (c *Cache[T]) Update(data T) {
 		c.updateCounter.Inc()
 		metrics.CacheUpdates.Inc()
 		c.persistToFile()
-		lumber.Done(strings.ToUpper(c.Name), "cache updated")
+		lumber.Done(strings.ToUpper(c.name), "cache updated")
 	}
 }
 
@@ -101,7 +101,7 @@ func (c *Cache[T]) StartPeriodicUpdate(updateFunc func() (T, error), interval ti
 	for range ticker.C {
 		data, err := updateFunc()
 		if err != nil {
-			lumber.ErrorMsg("updating cache", c.Name, "failed")
+			lumber.ErrorMsg("updating cache", c.name, "failed")
 			continue
 		}
 		c.Update(data)
