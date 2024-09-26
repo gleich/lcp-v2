@@ -98,6 +98,10 @@ func fetchActivities(minioClient minio.Client, tokens tokens) ([]activity, error
 		if stravaActivity.Private {
 			continue
 		}
+		hasMap := stravaActivity.Map.SummaryPolyline != ""
+		if !hasMap {
+			continue
+		}
 		a := activity{
 			Name:               stravaActivity.Name,
 			SportType:          stravaActivity.SportType,
@@ -108,20 +112,18 @@ func fetchActivities(minioClient minio.Client, tokens tokens) ([]activity, error
 			Distance:           stravaActivity.Distance,
 			ID:                 stravaActivity.ID,
 			AverageHeartrate:   stravaActivity.AverageHeartrate,
-			HasMap:             stravaActivity.Map.SummaryPolyline != "",
+			HasMap:             hasMap,
 			HeartrateData:      fetchHeartrate(stravaActivity.ID, tokens),
 		}
-		if a.HasMap {
-			mapData := fetchMap(stravaActivity.Map.SummaryPolyline)
-			uploadMap(minioClient, stravaActivity.ID, mapData)
-			a.MapBlurImage = mapBlurData(mapData)
-			imgurl := fmt.Sprintf(
-				"https://minio-api.dev.mattglei.ch/mapbox-maps/%d.png",
-				a.ID,
-			)
-			a.MapImageURL = &imgurl
-			activities = append(activities, a)
-		}
+		mapData := fetchMap(stravaActivity.Map.SummaryPolyline)
+		uploadMap(minioClient, stravaActivity.ID, mapData)
+		a.MapBlurImage = mapBlurData(mapData)
+		imgurl := fmt.Sprintf(
+			"https://minio-api.dev.mattglei.ch/mapbox-maps/%d.png",
+			a.ID,
+		)
+		a.MapImageURL = &imgurl
+		activities = append(activities, a)
 	}
 	removeOldMaps(minioClient, activities)
 
