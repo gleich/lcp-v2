@@ -120,8 +120,8 @@ func fetchActivities(minioClient minio.Client, tokens tokens) ([]activity, error
 				a.ID,
 			)
 			a.MapImageURL = &imgurl
+			activities = append(activities, a)
 		}
-		activities = append(activities, a)
 	}
 	removeOldMaps(minioClient, activities)
 
