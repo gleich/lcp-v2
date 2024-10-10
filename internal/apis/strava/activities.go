@@ -45,6 +45,10 @@ type activityStream struct {
 	Resolution   string `json:"resolution"`
 }
 
+type detailedStravaActivity struct {
+	Calories float32 `json:"calories"`
+}
+
 type activity struct {
 	Name               string    `json:"name"`
 	SportType          string    `json:"sport_type"`
@@ -59,6 +63,7 @@ type activity struct {
 	ID                 uint64    `json:"id"`
 	AverageHeartrate   float32   `json:"average_heartrate"`
 	HeartrateData      []int     `json:"heartrate_data"`
+	Calories           float32   `json:"calories"`
 }
 
 func fetchActivities(minioClient minio.Client, tokens tokens) ([]activity, error) {
@@ -102,6 +107,13 @@ func fetchActivities(minioClient minio.Client, tokens tokens) ([]activity, error
 		if !hasMap {
 			continue
 		}
+
+		details, err := fetchActivityDetails(stravaActivity.ID, tokens)
+		if err != nil {
+			lumber.Error(err, "failed to fetch activity details")
+			continue
+		}
+
 		a := activity{
 			Name:               stravaActivity.Name,
 			SportType:          stravaActivity.SportType,
@@ -114,6 +126,7 @@ func fetchActivities(minioClient minio.Client, tokens tokens) ([]activity, error
 			AverageHeartrate:   stravaActivity.AverageHeartrate,
 			HasMap:             hasMap,
 			HeartrateData:      fetchHeartrate(stravaActivity.ID, tokens),
+			Calories:           details.Calories,
 		}
 		mapData := fetchMap(stravaActivity.Map.SummaryPolyline)
 		uploadMap(minioClient, stravaActivity.ID, mapData)
@@ -169,4 +182,40 @@ func fetchHeartrate(id uint64, tokens tokens) []int {
 	}
 
 	return stream.Heartrate.Data
+}
+
+func fetchActivityDetails(id uint64, tokens tokens) (detailedStravaActivity, error) {
+	req, err := http.NewRequest(
+		"GET",
+		fmt.Sprintf("https://www.strava.com/api/v3/activities/%d", id),
+		nil,
+	)
+	if err != nil {
+		lumber.Error(err, "creating request failed")
+		return detailedStravaActivity{}, err
+	}
+	req.Header.Set("Authorization", "Bearer"+tokens.Access)
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		lumber.Error(err, "Failed to send request for activity details with an ID of", id)
+		return detailedStravaActivity{}, err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		lumber.Error(err, "reading response body failed")
+		return detailedStravaActivity{}, err
+	}
+
+	var details detailedStravaActivity
+	err = json.Unmarshal(body, &details)
+	if err != nil {
+		lumber.Error(err, "failed to parse json")
+		lumber.Debug(string(body))
+		return detailedStravaActivity{}, nil
+	}
+
+	return details, nil
 }
