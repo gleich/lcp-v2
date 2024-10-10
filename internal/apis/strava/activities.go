@@ -101,7 +101,7 @@ func fetchActivities(minioClient minio.Client, tokens tokens) ([]activity, error
 		if len(activities) >= 10 {
 			break
 		}
-		if stravaActivity.Private || !stravaActivity.HasHeartrate {
+		if stravaActivity.Private || !stravaActivity.HasHeartrate || stravaActivity.Commute {
 			continue
 		}
 
