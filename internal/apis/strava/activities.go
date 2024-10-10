@@ -36,6 +36,7 @@ type stravaActivity struct {
 	PrCount            uint32  `json:"pr_count"`
 	Distance           float32 `json:"distance"`
 	ID                 uint64  `json:"id"`
+	HasHeartrate       bool    `json:"has_heartrate"`
 }
 
 type activityStream struct {
@@ -100,11 +101,7 @@ func fetchActivities(minioClient minio.Client, tokens tokens) ([]activity, error
 		if len(activities) >= 10 {
 			break
 		}
-		if stravaActivity.Private {
-			continue
-		}
-		hasMap := stravaActivity.Map.SummaryPolyline != ""
-		if !hasMap {
+		if stravaActivity.Private || !stravaActivity.HasHeartrate {
 			continue
 		}
 
@@ -124,18 +121,20 @@ func fetchActivities(minioClient minio.Client, tokens tokens) ([]activity, error
 			Distance:           stravaActivity.Distance,
 			ID:                 stravaActivity.ID,
 			AverageHeartrate:   stravaActivity.AverageHeartrate,
-			HasMap:             hasMap,
+			HasMap:             stravaActivity.Map.SummaryPolyline != "",
 			HeartrateData:      fetchHeartrate(stravaActivity.ID, tokens),
 			Calories:           details.Calories,
 		}
-		mapData := fetchMap(stravaActivity.Map.SummaryPolyline)
-		uploadMap(minioClient, stravaActivity.ID, mapData)
-		a.MapBlurImage = mapBlurData(mapData)
-		imgurl := fmt.Sprintf(
-			"https://minio-api.dev.mattglei.ch/mapbox-maps/%d.png",
-			a.ID,
-		)
-		a.MapImageURL = &imgurl
+		if a.HasMap {
+			mapData := fetchMap(stravaActivity.Map.SummaryPolyline)
+			uploadMap(minioClient, stravaActivity.ID, mapData)
+			a.MapBlurImage = mapBlurData(mapData)
+			imgurl := fmt.Sprintf(
+				"https://minio-api.dev.mattglei.ch/mapbox-maps/%d.png",
+				a.ID,
+			)
+			a.MapImageURL = &imgurl
+		}
 		activities = append(activities, a)
 	}
 	removeOldMaps(minioClient, activities)
