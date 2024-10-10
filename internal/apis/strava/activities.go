@@ -173,6 +173,12 @@ func fetchHeartrate(id uint64, tokens tokens) []int {
 		return nil
 	}
 
+	if resp.StatusCode != http.StatusOK {
+		lumber.ErrorMsg("status code of", resp.StatusCode)
+		lumber.Debug(string(body))
+		return nil
+	}
+
 	var stream struct{ Heartrate activityStream }
 	err = json.Unmarshal(body, &stream)
 	if err != nil {
@@ -207,6 +213,12 @@ func fetchActivityDetails(id uint64, tokens tokens) (detailedStravaActivity, err
 	if err != nil {
 		lumber.Error(err, "reading response body failed")
 		return detailedStravaActivity{}, err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		lumber.ErrorMsg("status code of", resp.StatusCode)
+		lumber.Debug(string(body))
+		return detailedStravaActivity{}, nil
 	}
 
 	var details detailedStravaActivity
