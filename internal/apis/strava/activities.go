@@ -194,7 +194,7 @@ func fetchActivityDetails(id uint64, tokens tokens) (detailedStravaActivity, err
 		lumber.Error(err, "creating request failed")
 		return detailedStravaActivity{}, err
 	}
-	req.Header.Set("Authorization", "Bearer"+tokens.Access)
+	req.Header.Set("Authorization", "Bearer "+tokens.Access)
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
