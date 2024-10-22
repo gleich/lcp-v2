@@ -23,7 +23,7 @@ func loadTokens() tokens {
 	return tokens{
 		Access:    secrets.SECRETS.StravaAccessToken,
 		Refresh:   secrets.SECRETS.StravaRefreshToken,
-		ExpiresAt: secrets.SECRETS.StravaRefreshTokenExpiration,
+		ExpiresAt: 0, // starts at zero to force a refresh on boot
 	}
 }
 
