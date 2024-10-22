@@ -28,7 +28,8 @@ func loadTokens() tokens {
 }
 
 func (t *tokens) refreshIfNeeded() {
-	if t.ExpiresAt >= time.Now().Unix() {
+	// add 30 to ensure that token doesn't expire in the next 60 seconds
+	if t.ExpiresAt+60 >= time.Now().Unix() {
 		return
 	}
 
