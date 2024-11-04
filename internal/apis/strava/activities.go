@@ -101,8 +101,7 @@ func fetchActivities(minioClient minio.Client, tokens tokens) ([]activity, error
 		if len(activities) >= 5 {
 			break
 		}
-		if stravaActivity.Private || !stravaActivity.HasHeartrate || stravaActivity.Commute ||
-			stravaActivity.Map.SummaryPolyline == "" {
+		if stravaActivity.Private || !stravaActivity.HasHeartrate || stravaActivity.Commute {
 			continue
 		}
 
