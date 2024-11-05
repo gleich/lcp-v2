@@ -5,8 +5,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"os"
-	"strconv"
 	"time"
 
 	"github.com/gleich/lcp-v2/internal/secrets"
@@ -70,10 +68,6 @@ func (t *tokens) refreshIfNeeded() {
 		return
 	}
 
-	os.Setenv("STRAVA_ACCESS_TOKEN", tokens.Access)
-	os.Setenv("STRAVA_REFRESH_TOKEN", tokens.Refresh)
-	os.Setenv("STRAVA_REFRESH_TOKEN_EXPIRATION", strconv.FormatInt(tokens.ExpiresAt, 10))
 	*t = tokens
-
 	lumber.Done("loaded new strava access token:", t.Access)
 }
