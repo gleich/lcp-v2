@@ -6,9 +6,9 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var SECRETS SecretsData
+var SECRETS Secrets
 
-type SecretsData struct {
+type Secrets struct {
 	CacheFolder string `env:"CACHE_FOLDER"`
 	ValidToken  string `env:"VALID_TOKEN"`
 
@@ -35,7 +35,7 @@ func Load() {
 	if err != nil {
 		lumber.Fatal(err, "loading .env file failed")
 	}
-	loadedSecrets, err := env.ParseAs[SecretsData]()
+	loadedSecrets, err := env.ParseAs[Secrets]()
 	if err != nil {
 		lumber.Fatal(err, "parsing required env vars failed")
 	}
