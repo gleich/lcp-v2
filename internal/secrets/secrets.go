@@ -28,6 +28,9 @@ type Secrets struct {
 	SteamID  string `env:"STEAM_ID"`
 
 	GitHubAccessToken string `env:"GITHUB_ACCESS_TOKEN"`
+
+	AppleMusicAppToken  string `env:"APPLE_MUSIC_APP_TOKEN"`
+	AppleMusicUserToken string `env:"APPLE_MUSIC_USER_TOKEN"`
 }
 
 func Load() {
