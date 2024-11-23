@@ -14,6 +14,7 @@ type song struct {
 	DurationInMillis int      `json:"duration_in_millis"`
 	AlbumArtURL      string   `json:"album_art_url"`
 	URL              string   `json:"url"`
+	ID               string   `json:"id"`
 }
 
 type songResponse struct {
@@ -51,5 +52,6 @@ func songFromSongResponse(s songResponse) song {
 			strconv.Itoa(s.Attributes.Artwork.Width),
 		), "{h}", strconv.Itoa(s.Attributes.Artwork.Height)),
 		URL: s.Attributes.URL,
+		ID:  s.ID,
 	}
 }
