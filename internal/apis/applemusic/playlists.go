@@ -11,6 +11,7 @@ type playlist struct {
 	Name         string    `json:"name"`
 	Tracks       []song    `json:"tracks"`
 	LastModified time.Time `json:"last_modified"`
+	ID           string    `json:"id"`
 }
 
 type playlistTracksResponse struct {
@@ -20,6 +21,7 @@ type playlistTracksResponse struct {
 
 type playlistResponse struct {
 	Data []struct {
+		ID         string `json:"id"`
 		Attributes struct {
 			LastModifiedDate time.Time `json:"lastModifiedDate"`
 			Name             string    `json:"name"`
@@ -58,5 +60,6 @@ func fetchPlaylist(id string) (playlist, error) {
 		Name:         playlistData.Data[0].Attributes.Name,
 		LastModified: playlistData.Data[0].Attributes.LastModifiedDate,
 		Tracks:       tracks,
+		ID:           playlistData.Data[0].ID,
 	}, nil
 }
