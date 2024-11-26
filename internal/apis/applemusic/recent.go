@@ -16,5 +16,5 @@ func fetchRecentlyPlayed() ([]song, error) {
 	for _, s := range response.Data {
 		songs = append(songs, songFromSongResponse(s))
 	}
-	return songs, nil
+	return songs[:10], nil
 }
