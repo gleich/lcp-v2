@@ -37,7 +37,12 @@ func sendAPIRequest[T any](endpoint string) (T, error) {
 			"status code of %d returned from apple music API. Code of 200 expected",
 			resp.StatusCode,
 		)
-		lumber.Error(err)
+		if resp.StatusCode == http.StatusBadGateway ||
+			resp.StatusCode == http.StatusInternalServerError {
+			lumber.Warning(err)
+		} else {
+			lumber.Error(err)
+		}
 		return zeroValue, err
 	}
 
