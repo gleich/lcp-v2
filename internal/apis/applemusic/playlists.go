@@ -42,12 +42,14 @@ func fetchPlaylist(id string) (playlist, error) {
 	)
 	if err != nil {
 		lumber.Error(err, "failed to get tracks for playlist with id of", id)
+		return playlist{}, nil
 	}
 	totalResponseData = append(totalResponseData, trackData.Data...)
 	for trackData.Next != "" {
 		trackData, err = sendAPIRequest[playlistTracksResponse](trackData.Next)
 		if err != nil {
 			lumber.Error(err, "failed to paginate through tracks for playlist with id of", id)
+			return playlist{}, nil
 		}
 	}
 
