@@ -38,6 +38,7 @@ func sendAPIRequest[T any](endpoint string) (T, error) {
 			resp.StatusCode,
 		)
 		if resp.StatusCode == http.StatusBadGateway ||
+			resp.StatusCode == http.StatusGatewayTimeout ||
 			resp.StatusCode == http.StatusInternalServerError {
 			lumber.Warning(err)
 		} else {
