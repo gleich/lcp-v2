@@ -1,8 +1,13 @@
 package applemusic
 
 import (
+	"fmt"
+	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/gleich/lumber/v3"
 )
 
 type song struct {
@@ -35,10 +40,32 @@ type songResponse struct {
 		URL        string `json:"url"`
 		Name       string `json:"name"`
 		ArtistName string `json:"artistName"`
+		PlayParams struct {
+			CatalogID string `json:"catalogId"`
+		} `json:"playParams"`
 	} `json:"attributes"`
 }
 
 func songFromSongResponse(s songResponse) song {
+	if s.Attributes.URL == "" {
+		// remove special characters
+		re := regexp.MustCompile(`[^\w\s-]`)
+		slugURL := re.ReplaceAllString(s.Attributes.Name, "")
+		// replace spaces with hyphens
+		re = regexp.MustCompile(`\s+`)
+		slugURL = re.ReplaceAllString(slugURL, "-")
+
+		u, err := url.JoinPath(
+			"https://music.apple.com/us/song/",
+			strings.ToLower(slugURL),
+			fmt.Sprint(s.Attributes.PlayParams.CatalogID),
+		)
+		if err != nil {
+			lumber.Error(err, "failed to create URL for song", s.Attributes.Name)
+		}
+		s.Attributes.URL = u
+	}
+
 	return song{
 		Track:            s.Attributes.Name,
 		Artist:           s.Attributes.ArtistName,
