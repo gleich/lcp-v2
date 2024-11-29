@@ -49,11 +49,9 @@ type songResponse struct {
 func songFromSongResponse(s songResponse) song {
 	if s.Attributes.URL == "" {
 		// remove special characters
-		re := regexp.MustCompile(`[^\w\s-]`)
-		slugURL := re.ReplaceAllString(s.Attributes.Name, "")
+		slugURL := regexp.MustCompile(`[^\w\s-]`).ReplaceAllString(s.Attributes.Name, "")
 		// replace spaces with hyphens
-		re = regexp.MustCompile(`\s+`)
-		slugURL = re.ReplaceAllString(slugURL, "-")
+		slugURL = regexp.MustCompile(`\s+`).ReplaceAllString(slugURL, "-")
 
 		u, err := url.JoinPath(
 			"https://music.apple.com/us/song/",
