@@ -16,5 +16,16 @@ func fetchRecentlyPlayed() ([]song, error) {
 	for _, s := range response.Data {
 		songs = append(songs, songFromSongResponse(s))
 	}
-	return songs[:10], nil
+
+	// filter out duplicate songs
+	seen := make(map[string]bool)
+	uniqueSongs := []song{}
+	for _, song := range songs {
+		if !seen[song.ID] {
+			seen[song.ID] = true
+			uniqueSongs = append(uniqueSongs, song)
+		}
+	}
+
+	return uniqueSongs[:10], nil
 }
