@@ -81,7 +81,7 @@ func (c *Cache[T]) Update(data T) {
 		lumber.Error(err, "failed to json marshal new data")
 		return
 	}
-	if string(old) != string(new) {
+	if string(old) != string(new) && string(new) != "null" {
 		c.data = data
 		c.updated = time.Now()
 		updated = true
