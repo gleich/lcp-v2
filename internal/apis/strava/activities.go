@@ -1,10 +1,7 @@
 package strava
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
 	"net/url"
 	"time"
 
@@ -68,32 +65,13 @@ type activity struct {
 }
 
 func fetchActivities(minioClient minio.Client, tokens tokens) ([]activity, error) {
-	req, err := http.NewRequest("GET", "https://www.strava.com/api/v3/athlete/activities", nil)
+	stravaActivities, err := sendStravaAPIRequest[[]stravaActivity](
+		"api/v3/athlete/activities",
+		tokens,
+	)
 	if err != nil {
-		lumber.Error(err, "creating request failed")
-		return nil, err
-	}
-	req.Header.Set("Authorization", "Bearer "+tokens.Access)
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		lumber.Error(err, "sending request for Strava activities failed")
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		lumber.Error(err, "reading response body failed")
-		return nil, err
-	}
-
-	var stravaActivities []stravaActivity
-	err = json.Unmarshal(body, &stravaActivities)
-	if err != nil {
-		lumber.Error(err, "failed to parse json")
-		lumber.Debug(string(body))
-		return nil, err
+		lumber.Error(err, "failed to send request to Strava API to get activities")
+		return []activity{}, err
 	}
 
 	var activities []activity
@@ -148,84 +126,25 @@ func fetchHeartrate(id uint64, tokens tokens) []int {
 		"keys":        {"heartrate"},
 		"resolution":  {"low"},
 	}
-	req, err := http.NewRequest(
-		"GET",
-		fmt.Sprintf("https://www.strava.com/api/v3/activities/%d/streams?"+params.Encode(), id),
-		nil,
+	stream, err := sendStravaAPIRequest[struct{ Heartrate activityStream }](
+		fmt.Sprintf("api/v3/activities/%d/streams?%s", id, params.Encode()),
+		tokens,
 	)
 	if err != nil {
-		lumber.Error(err, "creating request failed")
-		return nil
-	}
-	req.Header.Set("Authorization", "Bearer "+tokens.Access)
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		lumber.Error(err, "Failed to send request for HR data for", id)
-		return nil
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		lumber.Error(err, "reading response body failed")
-		return nil
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		lumber.ErrorMsg("status code of", resp.StatusCode)
-		lumber.Debug(string(body))
-		return nil
-	}
-
-	var stream struct{ Heartrate activityStream }
-	err = json.Unmarshal(body, &stream)
-	if err != nil {
-		lumber.Error(err, "failed to parse json")
-		lumber.Debug(string(body))
-		return nil
+		lumber.Error(err, "failed to send request for HR data from activity with ID of", id)
 	}
 
 	return stream.Heartrate.Data
 }
 
 func fetchActivityDetails(id uint64, tokens tokens) (detailedStravaActivity, error) {
-	req, err := http.NewRequest(
-		"GET",
-		fmt.Sprintf("https://www.strava.com/api/v3/activities/%d", id),
-		nil,
+	details, err := sendStravaAPIRequest[detailedStravaActivity](
+		fmt.Sprintf("api/v3/activities/%d", id),
+		tokens,
 	)
 	if err != nil {
-		lumber.Error(err, "creating request failed")
+		lumber.Error(err, "failed to request detailed activity data for", id)
 		return detailedStravaActivity{}, err
-	}
-	req.Header.Set("Authorization", "Bearer "+tokens.Access)
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		lumber.Error(err, "Failed to send request for activity details with an ID of", id)
-		return detailedStravaActivity{}, err
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		lumber.Error(err, "reading response body failed")
-		return detailedStravaActivity{}, err
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		lumber.ErrorMsg("status code of", resp.StatusCode)
-		lumber.Debug(string(body))
-		return detailedStravaActivity{}, nil
-	}
-
-	var details detailedStravaActivity
-	err = json.Unmarshal(body, &details)
-	if err != nil {
-		lumber.Error(err, "failed to parse json")
-		lumber.Debug(string(body))
-		return detailedStravaActivity{}, nil
 	}
 
 	return details, nil

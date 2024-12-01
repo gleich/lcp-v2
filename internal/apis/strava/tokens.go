@@ -1,12 +1,11 @@
 package strava
 
 import (
-	"encoding/json"
-	"io"
 	"net/http"
 	"net/url"
 	"time"
 
+	"github.com/gleich/lcp-v2/internal/apis"
 	"github.com/gleich/lcp-v2/internal/secrets"
 	"github.com/gleich/lumber/v3"
 )
@@ -43,28 +42,10 @@ func (t *tokens) refreshIfNeeded() {
 		lumber.Error(err, "creating request for new token failed")
 		return
 	}
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		lumber.Error(err, "sending request for new data token failed")
-		return
-	}
-	defer resp.Body.Close()
 
-	body, err := io.ReadAll(resp.Body)
+	tokens, err := apis.SendRequest[tokens](req)
 	if err != nil {
-		lumber.Error(err, "reading response body failed")
-		return
-	}
-	if resp.StatusCode != http.StatusOK {
-		lumber.ErrorMsg(resp.StatusCode, "when trying to get new token data:", string(body))
-		return
-	}
-
-	var tokens tokens
-	err = json.Unmarshal(body, &tokens)
-	if err != nil {
-		lumber.Error(err, "failed to parse json")
-		lumber.Debug("body:", string(body))
+		lumber.Error(err, "failed to refresh tokens")
 		return
 	}
 
