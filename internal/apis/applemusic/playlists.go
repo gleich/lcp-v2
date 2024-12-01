@@ -1,9 +1,11 @@
 package applemusic
 
 import (
-	"path"
+	"net/http"
+	"net/url"
 	"time"
 
+	"github.com/gleich/lcp-v2/internal/apis"
 	"github.com/gleich/lumber/v3"
 )
 
@@ -30,26 +32,50 @@ type playlistResponse struct {
 }
 
 func fetchPlaylist(id string) (playlist, error) {
-	playlistData, err := sendAPIRequest[playlistResponse](path.Join("v1/me/library/playlists/", id))
+	u, err := url.JoinPath(API_ENDPOINT, "v1/me/library/playlist")
+	if err != nil {
+		lumber.Error(err, "failed to join urls")
+		return playlist{}, err
+	}
+	req, err := http.NewRequest("GET", u, nil)
+	if err != nil {
+		lumber.Error(err, "failed to make new request")
+		return playlist{}, err
+	}
+	playlistData, err := apis.SendRequest[playlistResponse](req)
 	if err != nil {
 		lumber.Error(err, "failed to fetch playlist for", id)
 		return playlist{}, err
 	}
 
+	u, err = url.JoinPath(API_ENDPOINT, "v1/me/library/playlists", id, "tracks")
+	if err != nil {
+		lumber.Error(err, "failed to join urls")
+		return playlist{}, err
+	}
+	req, err = http.NewRequest("GET", u, nil)
+	if err != nil {
+		lumber.Error(err, "failed to make new request")
+		return playlist{}, err
+	}
+
 	var totalResponseData []songResponse
-	trackData, err := sendAPIRequest[playlistTracksResponse](
-		path.Join("v1/me/library/playlists/", id, "tracks"),
-	)
+	trackData, err := apis.SendRequest[playlistTracksResponse](req)
 	if err != nil {
 		lumber.Error(err, "failed to get tracks for playlist with id of", id)
-		return playlist{}, nil
+		return playlist{}, err
 	}
 	totalResponseData = append(totalResponseData, trackData.Data...)
 	for trackData.Next != "" {
-		trackData, err = sendAPIRequest[playlistTracksResponse](trackData.Next)
+		req, err := http.NewRequest("GET", trackData.Next, nil)
+		if err != nil {
+			lumber.Error(err, "failed to make request for paginated track data", trackData.Next)
+			return playlist{}, err
+		}
+		trackData, err = apis.SendRequest[playlistTracksResponse](req)
 		if err != nil {
 			lumber.Error(err, "failed to paginate through tracks for playlist with id of", id)
-			return playlist{}, nil
+			return playlist{}, err
 		}
 	}
 

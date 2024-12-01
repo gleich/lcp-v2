@@ -8,6 +8,8 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
+const API_ENDPOINT = "https://api.music.apple.com/"
+
 type cacheData struct {
 	RecentlyPlayed []song              `json:"recently_played"`
 	Playlists      map[string]playlist `json:"playlists"`
