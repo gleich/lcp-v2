@@ -1,6 +1,7 @@
 package applemusic
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/gleich/lumber/v3"
@@ -29,14 +30,18 @@ type playlistResponse struct {
 }
 
 func fetchPlaylist(id string) (playlist, error) {
-	playlistData, err := sendAppleMusicAPIRequest[playlistResponse]("v1/me/library/playlist")
+	playlistData, err := sendAppleMusicAPIRequest[playlistResponse](
+		fmt.Sprintf("v1/me/library/playlists/%s", id),
+	)
 	if err != nil {
 		lumber.Error(err, "failed to fetch playlist for", id)
 		return playlist{}, err
 	}
 
 	var totalResponseData []songResponse
-	trackData, err := sendAppleMusicAPIRequest[playlistTracksResponse]("v1/me/library/playlists")
+	trackData, err := sendAppleMusicAPIRequest[playlistTracksResponse](
+		fmt.Sprintf("v1/me/library/playlists/%s/tracks", id),
+	)
 	if err != nil {
 		lumber.Error(err, "failed to get tracks for playlist with id of", id)
 		return playlist{}, err
