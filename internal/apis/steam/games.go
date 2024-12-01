@@ -1,14 +1,13 @@
 package steam
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"sort"
 	"time"
 
+	"github.com/gleich/lcp-v2/internal/apis"
 	"github.com/gleich/lcp-v2/internal/secrets"
 	"github.com/gleich/lumber/v3"
 )
@@ -47,33 +46,16 @@ func fetchRecentlyPlayedGames() ([]game, error) {
 		"include_appinfo": {"true"},
 		"format":          {"json"},
 	}
-	resp, err := http.Get(
-		"https://api.steampowered.com/IPlayerService/GetOwnedGames/v1?" + params.Encode(),
+	req, err := http.NewRequest("GET",
+		"https://api.steampowered.com/IPlayerService/GetOwnedGames/v1?"+params.Encode(), nil,
 	)
 	if err != nil {
+		lumber.Error(err, "failed to create request for steam API owned games")
+		return nil, err
+	}
+	ownedGames, err := apis.SendRequest[ownedGamesResponse](req)
+	if err != nil {
 		lumber.Error(err, "sending request for owned games failed")
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		lumber.Error(err, "reading response body for owned games failed")
-		return nil, err
-	}
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf(
-			"%d status code when trying to get owned games: %s\n",
-			resp.StatusCode,
-			string(body),
-		)
-	}
-
-	var ownedGames ownedGamesResponse
-	err = json.Unmarshal(body, &ownedGames)
-	if err != nil {
-		lumber.Error(err, "failed to parse json for owned games")
-		lumber.Debug("body:", string(body))
 		return nil, err
 	}
 

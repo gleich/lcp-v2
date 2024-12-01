@@ -26,8 +26,9 @@ func SendRequest[T any](req *http.Request) (T, error) {
 	}
 	if resp.StatusCode != http.StatusOK {
 		err = fmt.Errorf(
-			"status code of %d returned from API. Code of 200 expected",
+			"status code of %d returned from API. Code of 200 expected from %s",
 			resp.StatusCode,
+			req.URL.String(),
 		)
 		if resp.StatusCode == http.StatusBadGateway ||
 			resp.StatusCode == http.StatusGatewayTimeout ||

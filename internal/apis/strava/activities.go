@@ -71,7 +71,7 @@ func fetchActivities(minioClient minio.Client, tokens tokens) ([]activity, error
 	)
 	if err != nil {
 		lumber.Error(err, "failed to send request to Strava API to get activities")
-		return []activity{}, err
+		return nil, err
 	}
 
 	var activities []activity
