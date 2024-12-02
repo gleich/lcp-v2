@@ -3,6 +3,7 @@ package strava
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gleich/lcp-v2/internal/apis"
 	"github.com/gleich/lumber/v3"
@@ -11,7 +12,11 @@ import (
 func sendStravaAPIRequest[T any](path string, tokens tokens) (T, error) {
 	var zeroValue T
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("https://www.strava.com/%s", path), nil)
+	req, err := http.NewRequest(
+		"GET",
+		fmt.Sprintf("https://www.strava.com/%s", strings.TrimLeft(path, "/")),
+		nil,
+	)
 	if err != nil {
 		lumber.Error(err, "failed to create request")
 		return zeroValue, err

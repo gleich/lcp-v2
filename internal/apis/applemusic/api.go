@@ -3,6 +3,7 @@ package applemusic
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gleich/lcp-v2/internal/apis"
 	"github.com/gleich/lcp-v2/internal/secrets"
@@ -11,7 +12,11 @@ import (
 
 func sendAppleMusicAPIRequest[T any](path string) (T, error) {
 	var zeroValue T
-	req, err := http.NewRequest("GET", fmt.Sprintf("https://api.music.apple.com%s", path), nil)
+	req, err := http.NewRequest(
+		"GET",
+		fmt.Sprintf("https://api.music.apple.com/%s", strings.TrimLeft(path, "/")),
+		nil,
+	)
 	if err != nil {
 		lumber.Error(err, "failed to create request")
 		return zeroValue, err
