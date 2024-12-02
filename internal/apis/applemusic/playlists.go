@@ -53,6 +53,7 @@ func fetchPlaylist(id string) (playlist, error) {
 			lumber.Error(err, "failed to paginate through tracks for playlist with id of", id)
 			return playlist{}, err
 		}
+		totalResponseData = append(totalResponseData, trackData.Data...)
 	}
 
 	var tracks []song
