@@ -1,8 +1,8 @@
 package applemusic
 
 import (
+	"fmt"
 	"net/http"
-	"net/url"
 
 	"github.com/gleich/lcp-v2/internal/apis"
 	"github.com/gleich/lcp-v2/internal/secrets"
@@ -11,13 +11,7 @@ import (
 
 func sendAppleMusicAPIRequest[T any](path string) (T, error) {
 	var zeroValue T
-	u, err := url.JoinPath("https://api.music.apple.com/", path)
-	if err != nil {
-		lumber.Error(err, "failed to join URL")
-		return zeroValue, err
-	}
-
-	req, err := http.NewRequest("GET", u, nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("https://api.music.apple.com%s", path), nil)
 	if err != nil {
 		lumber.Error(err, "failed to create request")
 		return zeroValue, err

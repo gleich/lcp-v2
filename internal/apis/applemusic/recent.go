@@ -5,7 +5,7 @@ type recentlyPlayedResponse struct {
 }
 
 func fetchRecentlyPlayed() ([]song, error) {
-	response, err := sendAppleMusicAPIRequest[recentlyPlayedResponse]("v1/me/recent/played/tracks")
+	response, err := sendAppleMusicAPIRequest[recentlyPlayedResponse]("/v1/me/recent/played/tracks")
 	if err != nil {
 		return []song{}, err
 	}

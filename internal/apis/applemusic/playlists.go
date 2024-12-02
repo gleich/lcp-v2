@@ -2,10 +2,8 @@ package applemusic
 
 import (
 	"fmt"
-	"net/http"
 	"time"
 
-	"github.com/gleich/lcp-v2/internal/apis"
 	"github.com/gleich/lumber/v3"
 )
 
@@ -33,7 +31,7 @@ type playlistResponse struct {
 
 func fetchPlaylist(id string) (playlist, error) {
 	playlistData, err := sendAppleMusicAPIRequest[playlistResponse](
-		fmt.Sprintf("v1/me/library/playlists/%s", id),
+		fmt.Sprintf("/v1/me/library/playlists/%s", id),
 	)
 	if err != nil {
 		lumber.Error(err, "failed to fetch playlist for", id)
@@ -42,7 +40,7 @@ func fetchPlaylist(id string) (playlist, error) {
 
 	var totalResponseData []songResponse
 	trackData, err := sendAppleMusicAPIRequest[playlistTracksResponse](
-		fmt.Sprintf("v1/me/library/playlists/%s/tracks", id),
+		fmt.Sprintf("/v1/me/library/playlists/%s/tracks", id),
 	)
 	if err != nil {
 		lumber.Error(err, "failed to get tracks for playlist with id of", id)
@@ -50,12 +48,7 @@ func fetchPlaylist(id string) (playlist, error) {
 	}
 	totalResponseData = append(totalResponseData, trackData.Data...)
 	for trackData.Next != "" {
-		req, err := http.NewRequest("GET", trackData.Next, nil)
-		if err != nil {
-			lumber.Error(err, "failed to create pagination request")
-			return playlist{}, err
-		}
-		trackData, err = apis.SendRequest[playlistTracksResponse](req)
+		trackData, err = sendAppleMusicAPIRequest[playlistTracksResponse](trackData.Next)
 		if err != nil {
 			lumber.Error(err, "failed to paginate through tracks for playlist with id of", id)
 			return playlist{}, err
