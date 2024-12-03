@@ -9,6 +9,7 @@ import (
 	"sort"
 	"time"
 
+	"github.com/gleich/lcp-v2/internal/apis"
 	"github.com/gleich/lcp-v2/internal/secrets"
 	"github.com/gleich/lumber/v3"
 )
@@ -96,35 +97,18 @@ func fetchGameAchievements(appID int32) (*float32, *[]achievement) {
 		"appid":  {fmt.Sprint(appID)},
 		"format": {"json"},
 	}
-	resp, err = http.Get(
-		"https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2?" + params.Encode(),
+	req, err := http.NewRequest(
+		"GET",
+		"https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2?"+params.Encode(),
+		nil,
 	)
 	if err != nil {
-		lumber.Error(err, "sending request for owned games failed")
+		lumber.Error(err, "creating request for owned games failed for app id:", appID)
 		return nil, nil
 	}
-	defer resp.Body.Close()
-
-	body, err = io.ReadAll(resp.Body)
+	gameSchema, err := apis.SendRequest[schemaGameResponse](req)
 	if err != nil {
-		lumber.Error(err, "reading response body for game schema failed for", appID)
-		return nil, nil
-	}
-	if resp.StatusCode != http.StatusOK {
-		lumber.ErrorMsg(
-			resp.StatusCode,
-			"when trying to get player achievements for",
-			appID,
-			string(body),
-		)
-		return nil, nil
-	}
-
-	var gameSchema schemaGameResponse
-	err = json.Unmarshal(body, &gameSchema)
-	if err != nil {
-		lumber.Error(err, "failed to parse json for game schema for", appID)
-		lumber.Debug("body:", string(body))
+		lumber.Error(err, "failed to get game schema for app id:", appID)
 		return nil, nil
 	}
 
