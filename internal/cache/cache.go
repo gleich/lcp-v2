@@ -9,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/gleich/lcp-v2/internal/apis"
 	"github.com/gleich/lcp-v2/internal/metrics"
 	"github.com/gleich/lcp-v2/internal/secrets"
 	"github.com/gleich/lumber/v3"
@@ -100,7 +101,7 @@ func (c *Cache[T]) StartPeriodicUpdate(updateFunc func() (T, error), interval ti
 	defer ticker.Stop()
 	for range ticker.C {
 		data, err := updateFunc()
-		if err != nil {
+		if err != nil && err != apis.WarningError {
 			lumber.Error(err, "updating", c.name, "cache failed")
 			continue
 		}

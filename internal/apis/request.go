@@ -2,12 +2,15 @@ package apis
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 
 	"github.com/gleich/lumber/v3"
 )
+
+var WarningError = errors.New("Warning error when trying to make request. Ignore error.")
 
 // sends a given http.Request and will unmarshal the JSON from the response body and return that as the given type.
 func SendRequest[T any](req *http.Request) (T, error) {
@@ -34,6 +37,7 @@ func SendRequest[T any](req *http.Request) (T, error) {
 			resp.StatusCode == http.StatusGatewayTimeout ||
 			resp.StatusCode == http.StatusInternalServerError {
 			lumber.Warning(err)
+			return zeroValue, WarningError
 		} else {
 			lumber.Error(err)
 		}
