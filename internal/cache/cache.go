@@ -2,6 +2,7 @@ package cache
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"path/filepath"
@@ -103,7 +104,7 @@ func (c *Cache[T]) StartPeriodicUpdate(updateFunc func() (T, error), interval ti
 	defer ticker.Stop()
 	for range ticker.C {
 		data, err := updateFunc()
-		if err != nil && err.Error() != apis.WarningError.Error() {
+		if err != nil && !errors.Is(err, apis.WarningError) {
 			lumber.Error(err, "updating", c.name, "cache failed")
 			continue
 		}
