@@ -64,6 +64,8 @@ func (c *Cache[T]) ServeHTTP() http.HandlerFunc {
 		c.requestCounter.Inc()
 		if err != nil {
 			lumber.Error(err, "failed to write data")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
 		}
 	})
 }
