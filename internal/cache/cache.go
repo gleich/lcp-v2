@@ -101,7 +101,7 @@ func (c *Cache[T]) StartPeriodicUpdate(updateFunc func() (T, error), interval ti
 	defer ticker.Stop()
 	for range ticker.C {
 		data, err := updateFunc()
-		if err != nil && err != apis.WarningError {
+		if err != nil && err.Error() != apis.WarningError.Error() {
 			lumber.Error(err, "updating", c.name, "cache failed")
 			continue
 		}
