@@ -110,8 +110,8 @@ func (c *Cache[T]) StartPeriodicUpdate(updateFunc func() (T, error), interval ti
 			} else {
 				lumber.Error(err, "updating", c.name, "cache failed")
 			}
-			continue
+		} else {
+			c.Update(data)
 		}
-		c.Update(data)
 	}
 }
