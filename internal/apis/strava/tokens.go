@@ -1,6 +1,7 @@
 package strava
 
 import (
+	"errors"
 	"net/http"
 	"net/url"
 	"time"
@@ -45,7 +46,9 @@ func (t *tokens) refreshIfNeeded() {
 
 	tokens, err := apis.SendRequest[tokens](req)
 	if err != nil {
-		lumber.Error(err, "failed to refresh tokens")
+		if !errors.Is(err, apis.WarningError) {
+			lumber.Error(err, "failed to refresh tokens")
+		}
 		return
 	}
 

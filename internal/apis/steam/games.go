@@ -1,6 +1,7 @@
 package steam
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -55,7 +56,9 @@ func fetchRecentlyPlayedGames() ([]game, error) {
 	}
 	ownedGames, err := apis.SendRequest[ownedGamesResponse](req)
 	if err != nil {
-		lumber.Error(err, "sending request for owned games failed")
+		if !errors.Is(err, apis.WarningError) {
+			lumber.Error(err, "sending request for owned games failed")
+		}
 		return nil, err
 	}
 

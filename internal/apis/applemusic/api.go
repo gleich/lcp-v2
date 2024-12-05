@@ -1,6 +1,7 @@
 package applemusic
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -26,7 +27,9 @@ func sendAppleMusicAPIRequest[T any](path string) (T, error) {
 
 	resp, err := apis.SendRequest[T](req)
 	if err != nil {
-		lumber.Error(err, "failed to make apple music API request")
+		if !errors.Is(err, apis.WarningError) {
+			lumber.Error(err, "failed to make apple music API request")
+		}
 		return zeroValue, err
 	}
 	return resp, nil

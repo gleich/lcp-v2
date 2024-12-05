@@ -2,6 +2,7 @@ package steam
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -108,7 +109,9 @@ func fetchGameAchievements(appID int32) (*float32, *[]achievement) {
 	}
 	gameSchema, err := apis.SendRequest[schemaGameResponse](req)
 	if err != nil {
-		lumber.Error(err, "failed to get game schema for app id:", appID)
+		if !errors.Is(err, apis.WarningError) {
+			lumber.Error(err, "failed to get game schema for app id:", appID)
+		}
 		return nil, nil
 	}
 

@@ -1,6 +1,7 @@
 package strava
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -25,7 +26,9 @@ func sendStravaAPIRequest[T any](path string, tokens tokens) (T, error) {
 
 	resp, err := apis.SendRequest[T](req)
 	if err != nil {
-		lumber.Error(err, "failed to make strava API request")
+		if !errors.Is(err, apis.WarningError) {
+			lumber.Error(err, "failed to make strava API request")
+		}
 		return zeroValue, err
 	}
 	return resp, nil
