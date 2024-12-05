@@ -49,15 +49,13 @@ func (c *Cache[T]) loadFromFile() {
 	if _, err := os.Stat(c.filePath); !os.IsNotExist(err) {
 		b, err := os.ReadFile(c.filePath)
 		if err != nil {
-			lumber.Error(err, "reading from cache file from", c.filePath, "failed")
-			return
+			lumber.Fatal(err, "reading from cache file from", c.filePath, "failed")
 		}
 
 		var data cacheData[T]
 		err = json.Unmarshal(b, &data)
 		if err != nil {
-			lumber.Error(err, "unmarshal json data failed from:", string(b))
-			return
+			lumber.Fatal(err, "unmarshal json data failed from:", string(b))
 		}
 
 		c.data = data.Data
