@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/gleich/lcp-v2/internal/images"
 	"github.com/gleich/lumber/v3"
 	"github.com/minio/minio-go/v7"
 )
@@ -106,7 +107,8 @@ func fetchActivities(minioClient minio.Client, tokens tokens) ([]activity, error
 		if a.HasMap {
 			mapData := fetchMap(stravaActivity.Map.SummaryPolyline)
 			uploadMap(minioClient, stravaActivity.ID, mapData)
-			a.MapBlurImage = mapBlurData(mapData)
+			mapBlurURI := images.BlurDataURI(images.BlurImage(mapData))
+			a.MapBlurImage = &mapBlurURI
 			imgurl := fmt.Sprintf(
 				"https://minio-api.dev.mattglei.ch/mapbox-maps/%d.png",
 				a.ID,

@@ -1,12 +1,15 @@
 package applemusic
 
 import (
+	"bytes"
 	"fmt"
+	"net/http"
 	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
 
+	"github.com/gleich/lcp-v2/internal/images"
 	"github.com/gleich/lumber/v3"
 )
 
@@ -18,6 +21,7 @@ type song struct {
 	ReleaseDate      string   `json:"release_date"`
 	DurationInMillis int      `json:"duration_in_millis"`
 	AlbumArtURL      string   `json:"album_art_url"`
+	AlbumArtBlur     string   `json:"album_art_blur"`
 	URL              string   `json:"url"`
 	ID               string   `json:"id"`
 }
@@ -64,6 +68,22 @@ func songFromSongResponse(s songResponse) song {
 		s.Attributes.URL = u
 	}
 
+	albumArtURL := strings.ReplaceAll(strings.ReplaceAll(
+		s.Attributes.Artwork.URL,
+		"{w}",
+		strconv.Itoa(s.Attributes.Artwork.Width),
+	), "{h}", strconv.Itoa(s.Attributes.Artwork.Height))
+
+	resp, err := http.Get(albumArtURL)
+	if err != nil {
+		lumber.Error(err, "failed to fetch song album art", s.Attributes.Name)
+	}
+	var b bytes.Buffer
+	_, err = b.ReadFrom(resp.Body)
+	if err != nil {
+		lumber.Error(err, "failed to read data from request")
+	}
+
 	return song{
 		Track:            s.Attributes.Name,
 		Artist:           s.Attributes.ArtistName,
@@ -71,12 +91,9 @@ func songFromSongResponse(s songResponse) song {
 		Genres:           s.Attributes.GenreNames,
 		ReleaseDate:      s.Attributes.ReleaseDate,
 		DurationInMillis: s.Attributes.DurationInMillis,
-		AlbumArtURL: strings.ReplaceAll(strings.ReplaceAll(
-			s.Attributes.Artwork.URL,
-			"{w}",
-			strconv.Itoa(s.Attributes.Artwork.Width),
-		), "{h}", strconv.Itoa(s.Attributes.Artwork.Height)),
-		URL: s.Attributes.URL,
-		ID:  s.ID,
+		AlbumArtURL:      albumArtURL,
+		AlbumArtBlur:     images.BlurDataURI(images.BlurImage(b.Bytes())),
+		URL:              s.Attributes.URL,
+		ID:               s.ID,
 	}
 }
