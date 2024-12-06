@@ -65,7 +65,7 @@ func songFromSongResponse(s songResponse) song {
 		s.Attributes.URL = u
 	}
 
-	maxAlbumArtSize := 400.0
+	maxAlbumArtSize := 600.0
 	return song{
 		Track:            s.Attributes.Name,
 		Artist:           s.Attributes.ArtistName,
