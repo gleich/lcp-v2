@@ -1,11 +1,9 @@
 package applemusic
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
-	"github.com/gleich/lcp-v2/internal/apis"
 	"github.com/gleich/lumber/v3"
 )
 
@@ -45,9 +43,6 @@ func fetchPlaylist(id string) (playlist, error) {
 		fmt.Sprintf("/v1/me/library/playlists/%s/tracks", id),
 	)
 	if err != nil {
-		if !errors.Is(err, apis.WarningError) {
-			lumber.Error(err, "failed to get tracks for playlist with id of", id)
-		}
 		return playlist{}, err
 	}
 	totalResponseData = append(totalResponseData, trackData.Data...)
