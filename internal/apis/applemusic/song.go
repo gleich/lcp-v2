@@ -2,6 +2,7 @@ package applemusic
 
 import (
 	"fmt"
+	"math"
 	"net/url"
 	"regexp"
 	"strconv"
@@ -64,6 +65,7 @@ func songFromSongResponse(s songResponse) song {
 		s.Attributes.URL = u
 	}
 
+	maxAlbumArtSize := 200.0
 	return song{
 		Track:            s.Attributes.Name,
 		Artist:           s.Attributes.ArtistName,
@@ -74,8 +76,8 @@ func songFromSongResponse(s songResponse) song {
 		AlbumArtURL: strings.ReplaceAll(strings.ReplaceAll(
 			s.Attributes.Artwork.URL,
 			"{w}",
-			strconv.Itoa(s.Attributes.Artwork.Width),
-		), "{h}", strconv.Itoa(s.Attributes.Artwork.Height)),
+			strconv.Itoa(int(math.Min(float64(s.Attributes.Artwork.Width), maxAlbumArtSize))),
+		), "{h}", strconv.Itoa(int(math.Min(float64(s.Attributes.Artwork.Height), maxAlbumArtSize)))),
 		URL: s.Attributes.URL,
 		ID:  s.ID,
 	}
