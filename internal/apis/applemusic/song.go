@@ -3,6 +3,7 @@ package applemusic
 import (
 	"bytes"
 	"fmt"
+	"image/jpeg"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -92,7 +93,7 @@ func songFromSongResponse(s songResponse) song {
 		ReleaseDate:      s.Attributes.ReleaseDate,
 		DurationInMillis: s.Attributes.DurationInMillis,
 		AlbumArtURL:      albumArtURL,
-		AlbumArtBlur:     images.BlurDataURI(images.BlurImage(b.Bytes())),
+		AlbumArtBlur:     images.BlurDataURI(images.BlurImage(b.Bytes(), jpeg.Decode)),
 		URL:              s.Attributes.URL,
 		ID:               s.ID,
 	}

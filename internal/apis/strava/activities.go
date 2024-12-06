@@ -2,6 +2,7 @@ package strava
 
 import (
 	"fmt"
+	"image/png"
 	"net/url"
 	"time"
 
@@ -107,7 +108,7 @@ func fetchActivities(minioClient minio.Client, tokens tokens) ([]activity, error
 		if a.HasMap {
 			mapData := fetchMap(stravaActivity.Map.SummaryPolyline)
 			uploadMap(minioClient, stravaActivity.ID, mapData)
-			mapBlurURI := images.BlurDataURI(images.BlurImage(mapData))
+			mapBlurURI := images.BlurDataURI(images.BlurImage(mapData, png.Decode))
 			a.MapBlurImage = &mapBlurURI
 			imgurl := fmt.Sprintf(
 				"https://minio-api.dev.mattglei.ch/mapbox-maps/%d.png",
