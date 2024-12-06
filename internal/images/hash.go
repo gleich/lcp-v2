@@ -16,7 +16,7 @@ func BlurImage(data []byte, decoder func(r io.Reader) (image.Image, error)) []by
 	reader := bytes.NewReader(data)
 	parsedImage, err := decoder(reader)
 	if err != nil {
-		lumber.Error(err, "decoding PNG failed")
+		lumber.Error(err, "decoding image failed")
 		return nil
 	}
 
