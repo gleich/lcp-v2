@@ -1,9 +1,11 @@
 package applemusic
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
+	"github.com/gleich/lcp-v2/internal/apis"
 	"github.com/gleich/lumber/v3"
 )
 
@@ -34,7 +36,9 @@ func fetchPlaylist(id string) (playlist, error) {
 		fmt.Sprintf("/v1/me/library/playlists/%s", id),
 	)
 	if err != nil {
-		lumber.Error(err, "failed to fetch playlist for", id)
+		if !errors.Is(err, apis.WarningError) {
+			lumber.Error(err, "failed to fetch playlist for", id)
+		}
 		return playlist{}, err
 	}
 
@@ -49,7 +53,9 @@ func fetchPlaylist(id string) (playlist, error) {
 	for trackData.Next != "" {
 		trackData, err = sendAppleMusicAPIRequest[playlistTracksResponse](trackData.Next)
 		if err != nil {
-			lumber.Error(err, "failed to paginate through tracks for playlist with id of", id)
+			if !errors.Is(err, apis.WarningError) {
+				lumber.Error(err, "failed to paginate through tracks for playlist with id of", id)
+			}
 			return playlist{}, err
 		}
 		totalResponseData = append(totalResponseData, trackData.Data...)
