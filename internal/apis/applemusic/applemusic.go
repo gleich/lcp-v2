@@ -22,9 +22,9 @@ func cacheUpdate() (cacheData, error) {
 	}
 
 	playlistsIDs := []string{
-		"p.AWXoZoxHLrvpJlY", // CHILL
-		"p.qQXLxPLtA75zg8e", // HIGHSCHOOL 1989
-		"p.LV0PXNoCl0EpDLW", // DIVORCED DAD
+		"p.AWXoZoxHLrvpJlY", // chill
+		"p.qQXLxPLtA75zg8e", // 90s
+		"p.LV0PXNoCl0EpDLW", // divorced dad
 		"p.LV0PX3EIl0EpDLW", // jazz
 	}
 	playlists := map[string]playlist{}
