@@ -90,7 +90,10 @@ func fetchRecentlyPlayedGames() ([]game, error) {
 			libraryURLPtr = &libraryURL
 		}
 
-		achievementPercentage, achievements := fetchGameAchievements(g.AppID)
+		achievementPercentage, achievements, err := fetchGameAchievements(g.AppID)
+		if err != nil {
+			return nil, err
+		}
 
 		games = append(games, game{
 			Name:  g.Name,

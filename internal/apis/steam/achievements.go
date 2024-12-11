@@ -47,7 +47,7 @@ type achievement struct {
 	UnlockTime  *time.Time `json:"unlock_time"`
 }
 
-func fetchGameAchievements(appID int32) (*float32, *[]achievement) {
+func fetchGameAchievements(appID int32) (*float32, *[]achievement, error) {
 	params := url.Values{
 		"key":     {secrets.SECRETS.SteamKey},
 		"steamid": {secrets.SECRETS.SteamID},
@@ -59,17 +59,17 @@ func fetchGameAchievements(appID int32) (*float32, *[]achievement) {
 	)
 	if err != nil {
 		lumber.Error(err, "sending request for player achievements from", appID, "failed")
-		return nil, nil
+		return nil, nil, err
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		lumber.Error(err, "reading response body for player achievements from", appID, "failed")
-		return nil, nil
+		return nil, nil, err
 	}
 	if string(body) == `{"playerstats":{"error":"Requested app has no stats","success":false}}` {
-		return nil, nil
+		return nil, nil, err
 	}
 	if resp.StatusCode != http.StatusOK {
 		err := fmt.Errorf(
@@ -81,11 +81,11 @@ func fetchGameAchievements(appID int32) (*float32, *[]achievement) {
 			resp.StatusCode == http.StatusGatewayTimeout ||
 			resp.StatusCode == http.StatusInternalServerError {
 			lumber.Warning(err)
-			return nil, nil
+			return nil, nil, apis.WarningError
 		} else {
 			lumber.Error(err)
 		}
-		return nil, nil
+		return nil, nil, err
 	}
 
 	var playerAchievements playerAchievementsResponse
@@ -93,11 +93,11 @@ func fetchGameAchievements(appID int32) (*float32, *[]achievement) {
 	if err != nil {
 		lumber.Error(err, "failed to parse json for player achievements for", appID)
 		lumber.Debug("body:", string(body))
-		return nil, nil
+		return nil, nil, err
 	}
 
 	if playerAchievements.PlayerStats.Achievements == nil {
-		return nil, nil
+		return nil, nil, err
 	}
 
 	params = url.Values{
@@ -112,14 +112,14 @@ func fetchGameAchievements(appID int32) (*float32, *[]achievement) {
 	)
 	if err != nil {
 		lumber.Error(err, "creating request for owned games failed for app id:", appID)
-		return nil, nil
+		return nil, nil, err
 	}
 	gameSchema, err := apis.SendRequest[schemaGameResponse](req)
 	if err != nil {
 		if !errors.Is(err, apis.WarningError) {
 			lumber.Error(err, "failed to get game schema for app id:", appID)
 		}
-		return nil, nil
+		return nil, nil, err
 	}
 
 	var achievements []achievement
@@ -167,5 +167,5 @@ func fetchGameAchievements(appID int32) (*float32, *[]achievement) {
 		achievements = achievements[:5]
 	}
 
-	return &achievementPercentage, &achievements
+	return &achievementPercentage, &achievements, nil
 }
