@@ -72,12 +72,19 @@ func fetchGameAchievements(appID int32) (*float32, *[]achievement) {
 		return nil, nil
 	}
 	if resp.StatusCode != http.StatusOK {
-		lumber.ErrorMsg(
+		err := fmt.Errorf(
+			"status code of %d returned from API. Code of 200 expected from %s",
 			resp.StatusCode,
-			"when trying to get player achievements for",
-			appID,
-			string(body),
+			resp.Request.URL,
 		)
+		if resp.StatusCode == http.StatusBadGateway ||
+			resp.StatusCode == http.StatusGatewayTimeout ||
+			resp.StatusCode == http.StatusInternalServerError {
+			lumber.Warning(err)
+			return nil, nil
+		} else {
+			lumber.Error(err)
+		}
 		return nil, nil
 	}
 
