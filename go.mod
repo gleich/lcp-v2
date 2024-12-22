@@ -7,6 +7,7 @@ require (
 	github.com/caarlos0/env/v11 v11.2.2
 	github.com/gleich/lumber/v3 v3.0.2
 	github.com/go-chi/chi/v5 v5.1.0
+	github.com/gorilla/websocket v1.5.3
 	github.com/joho/godotenv v1.5.1
 	github.com/minio/minio-go/v7 v7.0.81
 	github.com/prometheus/client_golang v1.20.5
