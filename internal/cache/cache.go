@@ -45,7 +45,11 @@ func NewCache[T any](name string, data T) *Cache[T] {
 		}),
 		filePath:   filepath.Join(secrets.SECRETS.CacheFolder, fmt.Sprintf("%s.json", name)),
 		wsConnPool: make(map[*websocket.Conn]bool),
-		wsUpgrader: websocket.Upgrader{},
+		wsUpgrader: websocket.Upgrader{
+			CheckOrigin: func(r *http.Request) bool {
+				return true
+			},
+		},
 	}
 	cache.loadFromFile()
 	cache.Update(data)
