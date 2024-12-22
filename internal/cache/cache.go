@@ -64,10 +64,6 @@ type cacheData[T any] struct {
 // Handle a GET request to load data from the given cache
 func (c *Cache[T]) ServeHTTP() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get("Authorization") != "Bearer "+secrets.SECRETS.ValidToken {
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
 		c.dataMutex.RLock()
 		w.Header().Set("Content-Type", "application/json")
 		err := json.NewEncoder(w).Encode(cacheData[T]{Data: c.data, Updated: c.updated})
