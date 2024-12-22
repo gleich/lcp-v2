@@ -32,6 +32,12 @@ func (c *Cache[T]) ServeWS() http.HandlerFunc {
 		// spawning goroutine to handle connection
 		go func() {
 			defer c.removeConnection(conn)
+			for {
+				_, _, err := conn.ReadMessage()
+				if err != nil {
+					return
+				}
+			}
 		}()
 	}
 }
