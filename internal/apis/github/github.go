@@ -26,6 +26,7 @@ func Setup(router *chi.Mux) {
 
 	githubCache := cache.NewCache("github", pinnedRepos)
 	router.Get("/github/cache", githubCache.ServeHTTP())
+	router.Handle("/github/cache/ws", githubCache.ServeWS())
 	go githubCache.StartPeriodicUpdate(
 		func() ([]repository, error) { return fetchPinnedRepos(githubClient) },
 		2*time.Minute,

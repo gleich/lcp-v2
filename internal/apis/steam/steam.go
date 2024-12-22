@@ -16,6 +16,7 @@ func Setup(router *chi.Mux) {
 
 	steamCache := cache.NewCache("steam", games)
 	router.Get("/steam/cache", steamCache.ServeHTTP())
+	router.Handle("/steam/cache/ws", steamCache.ServeWS())
 	go steamCache.StartPeriodicUpdate(fetchRecentlyPlayedGames, 5*time.Minute)
 	lumber.Done("setup steam cache")
 }
