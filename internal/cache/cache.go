@@ -103,11 +103,15 @@ func (c *Cache[T]) Update(data T) {
 		metrics.CacheUpdates.Inc()
 		c.persistToFile()
 		connectionsUpdated := c.broadcastUpdate()
-		lumber.Done(
-			strings.ToUpper(c.name),
-			"cache updated;",
-			"broadcasted to", connectionsUpdated, "websocket connections",
-		)
+		if connectionsUpdated == 0 {
+			lumber.Done(strings.ToUpper(c.name), "cache updated")
+		} else {
+			lumber.Done(
+				strings.ToUpper(c.name),
+				"cache updated;",
+				"updated", connectionsUpdated, "websocket connections",
+			)
+		}
 	}
 }
 
