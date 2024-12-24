@@ -11,8 +11,8 @@ import (
 const API_ENDPOINT = "https://api.music.apple.com/"
 
 type cacheData struct {
-	RecentlyPlayed []song              `json:"recently_played"`
-	Playlists      map[string]playlist `json:"playlists"`
+	RecentlyPlayed []song     `json:"recently_played"`
+	Playlists      []playlist `json:"playlists"`
 }
 
 func cacheUpdate() (cacheData, error) {
@@ -36,13 +36,13 @@ func cacheUpdate() (cacheData, error) {
 		// "p.qQXLxPpFA75zg8e", // RAHHHHHHHH
 		// "p.qQXLxpDuA75zg8e", // ROCK
 	}
-	playlists := map[string]playlist{}
+	playlists := []playlist{}
 	for _, id := range playlistsIDs {
 		playlistData, err := fetchPlaylist(id)
 		if err != nil {
 			return cacheData{}, err
 		}
-		playlists[id] = playlistData
+		playlists = append(playlists, playlistData)
 	}
 
 	return cacheData{
