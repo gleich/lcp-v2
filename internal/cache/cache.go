@@ -50,8 +50,8 @@ type cacheData[T any] struct {
 
 func (c *Cache[T]) ServeHTTP() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		c.dataMutex.RLock()
 		w.Header().Set("Content-Type", "application/json")
+		c.dataMutex.RLock()
 		err := json.NewEncoder(w).Encode(cacheData[T]{Data: c.data, Updated: c.updated})
 		c.dataMutex.RUnlock()
 		if err != nil {
