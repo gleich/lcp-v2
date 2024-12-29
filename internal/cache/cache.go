@@ -64,23 +64,25 @@ func (c *Cache[T]) ServeHTTP() http.HandlerFunc {
 
 func (c *Cache[T]) Update(data T) {
 	var updated bool
-	c.dataMutex.Lock()
+	c.dataMutex.RLock()
 	old, err := json.Marshal(c.data)
 	if err != nil {
 		lumber.Error(err, "failed to json marshal old data")
 		return
 	}
+	c.dataMutex.RUnlock()
 	new, err := json.Marshal(data)
 	if err != nil {
 		lumber.Error(err, "failed to json marshal new data")
 		return
 	}
 	if string(old) != string(new) && string(new) != "null" && strings.Trim(string(new), " ") != "" {
+		c.dataMutex.Lock()
 		c.data = data
 		c.updated = time.Now()
+		c.dataMutex.Unlock()
 		updated = true
 	}
-	c.dataMutex.Unlock()
 
 	if updated {
 		c.persistToFile()
