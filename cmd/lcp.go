@@ -12,7 +12,6 @@ import (
 	"github.com/gleich/lumber/v3"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func main() {
@@ -25,7 +24,6 @@ func main() {
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.RedirectSlashes)
 	r.HandleFunc("/", rootRedirect)
-	r.HandleFunc("/metrics", promhttp.Handler().ServeHTTP)
 
 	github.Setup(r)
 	strava.Setup(r)

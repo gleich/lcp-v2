@@ -11,12 +11,9 @@ import (
 	"time"
 
 	"github.com/gleich/lcp-v2/internal/apis"
-	"github.com/gleich/lcp-v2/internal/metrics"
 	"github.com/gleich/lcp-v2/internal/secrets"
 	"github.com/gleich/lumber/v3"
 	"github.com/gorilla/websocket"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
 )
 
 type Cache[T any] struct {
@@ -24,8 +21,6 @@ type Cache[T any] struct {
 	dataMutex       sync.RWMutex
 	data            T
 	updated         time.Time
-	updateCounter   prometheus.Counter
-	requestCounter  prometheus.Counter
 	filePath        string
 	wsConnPool      map[*websocket.Conn]bool
 	wsConnPoolMutex sync.Mutex
@@ -34,15 +29,7 @@ type Cache[T any] struct {
 
 func New[T any](name string, data T) *Cache[T] {
 	cache := Cache[T]{
-		name: name,
-		updateCounter: promauto.NewCounter(prometheus.CounterOpts{
-			Name: fmt.Sprintf("cache_%s_updates", name),
-			Help: fmt.Sprintf(`The total number of times the cache "%s" has been updated`, name),
-		}),
-		requestCounter: promauto.NewCounter(prometheus.CounterOpts{
-			Name: fmt.Sprintf("cache_%s_requests", name),
-			Help: fmt.Sprintf(`The total number of times the cache "%s" has been requested`, name),
-		}),
+		name:       name,
 		filePath:   filepath.Join(secrets.SECRETS.CacheFolder, fmt.Sprintf("%s.json", name)),
 		wsConnPool: make(map[*websocket.Conn]bool),
 		wsUpgrader: websocket.Upgrader{
@@ -68,7 +55,6 @@ func (c *Cache[T]) ServeHTTP() http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 		err := json.NewEncoder(w).Encode(cacheData[T]{Data: c.data, Updated: c.updated})
 		c.dataMutex.RUnlock()
-		c.requestCounter.Inc()
 		if err != nil {
 			lumber.Error(err, "failed to write data")
 			w.WriteHeader(http.StatusInternalServerError)
@@ -99,8 +85,6 @@ func (c *Cache[T]) Update(data T) {
 	c.dataMutex.Unlock()
 
 	if updated {
-		c.updateCounter.Inc()
-		metrics.CacheUpdates.Inc()
 		c.persistToFile()
 		connectionsUpdated := c.broadcastUpdate()
 		if connectionsUpdated == 0 {
