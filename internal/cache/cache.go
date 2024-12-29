@@ -48,7 +48,6 @@ type cacheData[T any] struct {
 	Updated time.Time `json:"updated"`
 }
 
-// Handle a GET request to load data from the given cache
 func (c *Cache[T]) ServeHTTP() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		c.dataMutex.RLock()
@@ -63,7 +62,6 @@ func (c *Cache[T]) ServeHTTP() http.HandlerFunc {
 	})
 }
 
-// Update the given cache
 func (c *Cache[T]) Update(data T) {
 	var updated bool
 	c.dataMutex.Lock()
