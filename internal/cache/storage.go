@@ -31,10 +31,12 @@ func (c *Cache[T]) persistToFile() {
 	}
 	defer file.Close()
 
+	c.dataMutex.RLock()
 	b, err := json.Marshal(cacheData[T]{
 		Data:    c.data,
 		Updated: c.updated,
 	})
+	c.dataMutex.RUnlock()
 	if err != nil {
 		lumber.Error(err, "encoding data to json failed")
 		return

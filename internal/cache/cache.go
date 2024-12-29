@@ -30,6 +30,7 @@ type Cache[T any] struct {
 func New[T any](name string, data T) *Cache[T] {
 	cache := Cache[T]{
 		name:       name,
+		updated:    time.Now(),
 		filePath:   filepath.Join(secrets.SECRETS.CacheFolder, fmt.Sprintf("%s.json", name)),
 		wsConnPool: make(map[*websocket.Conn]bool),
 		wsUpgrader: websocket.Upgrader{
@@ -63,7 +64,6 @@ func (c *Cache[T]) ServeHTTP() http.HandlerFunc {
 }
 
 func (c *Cache[T]) Update(data T) {
-	var updated bool
 	c.dataMutex.RLock()
 	old, err := json.Marshal(c.data)
 	if err != nil {
@@ -76,15 +76,13 @@ func (c *Cache[T]) Update(data T) {
 		lumber.Error(err, "failed to json marshal new data")
 		return
 	}
+
 	if string(old) != string(new) && string(new) != "null" && strings.Trim(string(new), " ") != "" {
 		c.dataMutex.Lock()
 		c.data = data
 		c.updated = time.Now()
 		c.dataMutex.Unlock()
-		updated = true
-	}
 
-	if updated {
 		c.persistToFile()
 		connectionsUpdated := c.broadcastUpdate()
 		if connectionsUpdated == 0 {
@@ -99,11 +97,11 @@ func (c *Cache[T]) Update(data T) {
 	}
 }
 
-func (c *Cache[T]) UpdatePeriodically(updateFunc func() (T, error), interval time.Duration) {
+func (c *Cache[T]) UpdatePeriodically(update func() (T, error), interval time.Duration) {
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
 	for range ticker.C {
-		data, err := updateFunc()
+		data, err := update()
 		if err != nil {
 			if !errors.Is(err, apis.WarningError) {
 				lumber.Error(err, "updating", c.name, "cache failed")
