@@ -28,8 +28,8 @@ func Setup(router *chi.Mux) {
 		lumber.ErrorMsg("failed to load initial data for strava cache; not updating")
 	}
 	stravaCache := cache.New("strava", stravaActivities)
-	router.Get("/strava/cache", stravaCache.ServeHTTP())
-	router.Handle("/strava/cache/ws", stravaCache.ServeWS())
+	router.Get("/strava", stravaCache.ServeHTTP())
+	router.Handle("/strava/ws", stravaCache.ServeWS())
 	router.Post("/strava/event", eventRoute(stravaCache, *minioClient, stravaTokens))
 	router.Get("/strava/event", challengeRoute)
 
