@@ -24,10 +24,10 @@ func Setup(router *chi.Mux) {
 		lumber.Fatal(err, "fetching initial pinned repos failed")
 	}
 
-	githubCache := cache.NewCache("github", pinnedRepos)
+	githubCache := cache.New("github", pinnedRepos)
 	router.Get("/github/cache", githubCache.ServeHTTP())
 	router.Handle("/github/cache/ws", githubCache.ServeWS())
-	go githubCache.StartPeriodicUpdate(
+	go githubCache.UpdatePeriodically(
 		func() ([]repository, error) { return fetchPinnedRepos(githubClient) },
 		2*time.Minute,
 	)

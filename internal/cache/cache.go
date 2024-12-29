@@ -32,7 +32,7 @@ type Cache[T any] struct {
 	wsUpgrader      websocket.Upgrader
 }
 
-func NewCache[T any](name string, data T) *Cache[T] {
+func New[T any](name string, data T) *Cache[T] {
 	cache := Cache[T]{
 		name: name,
 		updateCounter: promauto.NewCounter(prometheus.CounterOpts{
@@ -115,7 +115,7 @@ func (c *Cache[T]) Update(data T) {
 	}
 }
 
-func (c *Cache[T]) StartPeriodicUpdate(updateFunc func() (T, error), interval time.Duration) {
+func (c *Cache[T]) UpdatePeriodically(updateFunc func() (T, error), interval time.Duration) {
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
 	for range ticker.C {

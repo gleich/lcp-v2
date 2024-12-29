@@ -58,9 +58,9 @@ func Setup(router *chi.Mux) {
 		lumber.Fatal(err, "initial fetch of cache data failed")
 	}
 
-	applemusicCache := cache.NewCache("applemusic", data)
+	applemusicCache := cache.New("applemusic", data)
 	router.Get("/applemusic/cache", applemusicCache.ServeHTTP())
 	router.Handle("/applemusic/cache/ws", applemusicCache.ServeWS())
-	go applemusicCache.StartPeriodicUpdate(cacheUpdate, 30*time.Second)
+	go applemusicCache.UpdatePeriodically(cacheUpdate, 30*time.Second)
 	lumber.Done("setup apple music cache")
 }
