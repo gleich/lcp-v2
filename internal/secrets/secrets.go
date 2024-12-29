@@ -10,7 +10,6 @@ var SECRETS Secrets
 
 type Secrets struct {
 	CacheFolder string `env:"CACHE_FOLDER"`
-	ValidToken  string `env:"VALID_TOKEN"`
 
 	StravaClientID       string `env:"STRAVA_CLIENT_ID"`
 	StravaClientSecret   string `env:"STRAVA_CLIENT_SECRET"`
