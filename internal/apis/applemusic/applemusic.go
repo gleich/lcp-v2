@@ -22,7 +22,8 @@ func cacheUpdate() (cacheData, error) {
 	}
 
 	playlistsIDs := []string{
-		"p.qQXLxPLtA75zg8e", // 80s
+		// "p.qQXLxPLtA75zg8e", // 80s
+		"p.QvDQE5RIVbAeokL", // PARTY
 		"p.LV0PX3EIl0EpDLW", // jazz
 		"p.AWXoZoxHLrvpJlY", // chill
 		"p.V7VYVB0hZo53MQv", // old man
@@ -32,7 +33,6 @@ func cacheUpdate() (cacheData, error) {
 		// "p.gek1E8efLa68Adp", // classics
 		// "p.6xZaArOsvzb5OML", // focus
 		// "p.O1kz7EoFVmvz704", // funk
-		// "p.QvDQE5RIVbAeokL", // PARTY
 		// "p.qQXLxPpFA75zg8e", // RAHHHHHHHH
 		// "p.qQXLxpDuA75zg8e", // ROCK
 		// "p.QvDQEebsVbAeokL", // christmas
