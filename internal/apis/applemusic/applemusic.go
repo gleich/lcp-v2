@@ -23,14 +23,14 @@ func cacheUpdate() (cacheData, error) {
 
 	playlistsIDs := []string{
 		// "p.qQXLxPLtA75zg8e", // 80s
-		"p.QvDQE5RIVbAeokL", // PARTY
+		"p.gek1E8efLa68Adp", // classics
 		"p.LV0PX3EIl0EpDLW", // jazz
 		"p.AWXoZoxHLrvpJlY", // chill
 		"p.V7VYVB0hZo53MQv", // old man
 		// "p.LV0PXNoCl0EpDLW", // divorced dad
 		// "p.AWXoXPYSLrvpJlY", // alt
+		// "p.QvDQE5RIVbAeokL", // PARTY
 		// "p.LV0PXL3Cl0EpDLW", // bops
-		// "p.gek1E8efLa68Adp", // classics
 		// "p.6xZaArOsvzb5OML", // focus
 		// "p.O1kz7EoFVmvz704", // funk
 		// "p.qQXLxPpFA75zg8e", // RAHHHHHHHH
