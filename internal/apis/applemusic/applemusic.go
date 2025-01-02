@@ -35,6 +35,9 @@ func cacheUpdate() (cacheData, error) {
 		"p.O1kz7EoFVmvz704", // funk
 		"p.qQXLxPpFA75zg8e", // RAHHHHHHHH
 		"p.qQXLxpDuA75zg8e", // ROCK
+		"p.O1kz7zbsVmvz704", // country
+		"p.QvDQEN0IVbAeokL", // fall
+		"p.ZOAXAMZF4KMD6ob", // sad girl music
 		// "p.QvDQEebsVbAeokL", // christmas
 	}
 	playlists := []playlist{}
