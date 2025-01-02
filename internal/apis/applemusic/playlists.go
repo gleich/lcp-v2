@@ -1,12 +1,16 @@
 package applemusic
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/gleich/lcp-v2/internal/apis"
+	"github.com/gleich/lcp-v2/internal/cache"
 	"github.com/gleich/lumber/v3"
+	"github.com/go-chi/chi/v5"
 )
 
 type playlist struct {
@@ -72,4 +76,32 @@ func fetchPlaylist(id string) (playlist, error) {
 		Tracks:       tracks,
 		ID:           playlistData.Data[0].ID,
 	}, nil
+}
+
+func playlistEndpoint(c *cache.Cache[cacheData]) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		id := chi.URLParam(r, "id")
+
+		c.DataMutex.RLock()
+		var p *playlist
+		for _, plist := range c.Data.Playlists {
+			if plist.ID == id {
+				p = &plist
+				break
+			}
+		}
+
+		if p == nil {
+			c.DataMutex.RUnlock()
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		err := json.NewEncoder(w).Encode(p)
+		c.DataMutex.RUnlock()
+		if err != nil {
+			lumber.Error(err, "failed to write json data to request")
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+	})
 }

@@ -20,9 +20,9 @@ func (c *Cache[T]) ServeWS() http.HandlerFunc {
 		c.wsConnPoolMutex.Unlock()
 
 		// sending initial data
-		c.dataMutex.RLock()
-		err = conn.WriteJSON(c.data)
-		c.dataMutex.RUnlock()
+		c.DataMutex.RLock()
+		err = conn.WriteJSON(c.Data)
+		c.DataMutex.RUnlock()
 		if err != nil {
 			lumber.Error(err, "failed to write initial cache data for", c.name)
 			c.removeConnection(conn)
@@ -43,9 +43,9 @@ func (c *Cache[T]) ServeWS() http.HandlerFunc {
 }
 
 func (c *Cache[T]) broadcastUpdate() int {
-	c.dataMutex.RLock()
-	d := c.data
-	c.dataMutex.RUnlock()
+	c.DataMutex.RLock()
+	d := c.Data
+	c.DataMutex.RUnlock()
 
 	updatedConnections := 0
 	for conn := range c.wsConnPool {

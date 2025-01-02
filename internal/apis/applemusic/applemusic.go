@@ -60,6 +60,7 @@ func Setup(router *chi.Mux) {
 
 	applemusicCache := cache.New("applemusic", data)
 	router.Get("/applemusic", applemusicCache.ServeHTTP())
+	router.Get("/applemusic/playlist/{id}", playlistEndpoint(*&applemusicCache))
 	router.Handle("/applemusic/ws", applemusicCache.ServeWS())
 	go applemusicCache.UpdatePeriodically(cacheUpdate, 30*time.Second)
 	lumber.Done("setup apple music cache")

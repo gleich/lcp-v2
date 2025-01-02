@@ -18,8 +18,8 @@ import (
 
 type Cache[T any] struct {
 	name            string
-	dataMutex       sync.RWMutex
-	data            T
+	DataMutex       sync.RWMutex
+	Data            T
 	updated         time.Time
 	filePath        string
 	wsConnPool      map[*websocket.Conn]bool
@@ -52,25 +52,24 @@ type cacheData[T any] struct {
 func (c *Cache[T]) ServeHTTP() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		c.dataMutex.RLock()
-		err := json.NewEncoder(w).Encode(cacheData[T]{Data: c.data, Updated: c.updated})
-		c.dataMutex.RUnlock()
+		c.DataMutex.RLock()
+		err := json.NewEncoder(w).Encode(cacheData[T]{Data: c.Data, Updated: c.updated})
+		c.DataMutex.RUnlock()
 		if err != nil {
-			lumber.Error(err, "failed to write data")
+			lumber.Error(err, "failed to write json data to request")
 			w.WriteHeader(http.StatusInternalServerError)
-			return
 		}
 	})
 }
 
 func (c *Cache[T]) Update(data T) {
-	c.dataMutex.RLock()
-	old, err := json.Marshal(c.data)
+	c.DataMutex.RLock()
+	old, err := json.Marshal(c.Data)
 	if err != nil {
 		lumber.Error(err, "failed to json marshal old data")
 		return
 	}
-	c.dataMutex.RUnlock()
+	c.DataMutex.RUnlock()
 	new, err := json.Marshal(data)
 	if err != nil {
 		lumber.Error(err, "failed to json marshal new data")
@@ -78,10 +77,10 @@ func (c *Cache[T]) Update(data T) {
 	}
 
 	if string(old) != string(new) && string(new) != "null" && strings.Trim(string(new), " ") != "" {
-		c.dataMutex.Lock()
-		c.data = data
+		c.DataMutex.Lock()
+		c.Data = data
 		c.updated = time.Now()
-		c.dataMutex.Unlock()
+		c.DataMutex.Unlock()
 
 		c.persistToFile()
 		connectionsUpdated := c.broadcastUpdate()
