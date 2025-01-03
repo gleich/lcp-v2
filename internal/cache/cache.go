@@ -20,7 +20,7 @@ type Cache[T any] struct {
 	name            string
 	DataMutex       sync.RWMutex
 	Data            T
-	updated         time.Time
+	Updated         time.Time
 	filePath        string
 	wsConnPool      map[*websocket.Conn]bool
 	wsConnPoolMutex sync.Mutex
@@ -30,7 +30,7 @@ type Cache[T any] struct {
 func New[T any](name string, data T) *Cache[T] {
 	cache := Cache[T]{
 		name:       name,
-		updated:    time.Now(),
+		Updated:    time.Now(),
 		filePath:   filepath.Join(secrets.SECRETS.CacheFolder, fmt.Sprintf("%s.json", name)),
 		wsConnPool: make(map[*websocket.Conn]bool),
 		wsUpgrader: websocket.Upgrader{
@@ -44,7 +44,7 @@ func New[T any](name string, data T) *Cache[T] {
 	return &cache
 }
 
-type cacheData[T any] struct {
+type CacheResponse[T any] struct {
 	Data    T         `json:"data"`
 	Updated time.Time `json:"updated"`
 }
@@ -53,7 +53,7 @@ func (c *Cache[T]) ServeHTTP() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		c.DataMutex.RLock()
-		err := json.NewEncoder(w).Encode(cacheData[T]{Data: c.Data, Updated: c.updated})
+		err := json.NewEncoder(w).Encode(CacheResponse[T]{Data: c.Data, Updated: c.Updated})
 		c.DataMutex.RUnlock()
 		if err != nil {
 			lumber.Error(err, "failed to write json data to request")
@@ -79,7 +79,7 @@ func (c *Cache[T]) Update(data T) {
 	if string(old) != string(new) && string(new) != "null" && strings.Trim(string(new), " ") != "" {
 		c.DataMutex.Lock()
 		c.Data = data
-		c.updated = time.Now()
+		c.Updated = time.Now()
 		c.DataMutex.Unlock()
 
 		c.persistToFile()

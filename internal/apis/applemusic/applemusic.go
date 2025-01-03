@@ -67,8 +67,13 @@ func Setup(router *chi.Mux) {
 	router.Get("/applemusic", serveHTTP(applemusicCache))
 	router.Get("/applemusic/playlists/{id}", playlistEndpoint(applemusicCache))
 	router.Handle("/applemusic/ws", applemusicCache.ServeWS())
-	go applemusicCache.UpdatePeriodically(cacheUpdate, 30*time.Second)
+	go applemusicCache.UpdatePeriodically(cacheUpdate, 1*time.Minute)
 	lumber.Done("setup apple music cache")
+}
+
+type cacheDataResponse struct {
+	PlaylistSummaries []playlistSummary `json:"playlist_summaries"`
+	RecentlyPlayed    []song            `json:"recently_played"`
 }
 
 func serveHTTP(c *cache.Cache[cacheData]) http.HandlerFunc {
@@ -76,10 +81,7 @@ func serveHTTP(c *cache.Cache[cacheData]) http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 		c.DataMutex.RLock()
 
-		data := struct {
-			PlaylistSummaries []playlistSummary `json:"playlist_summaries"`
-			RecentlyPlayed    []song            `json:"recently_played"`
-		}{}
+		data := cacheDataResponse{}
 		for _, p := range c.Data.Playlists {
 			firstFourTracks := []song{}
 			for _, track := range p.Tracks {
@@ -99,7 +101,8 @@ func serveHTTP(c *cache.Cache[cacheData]) http.HandlerFunc {
 		}
 		data.RecentlyPlayed = c.Data.RecentlyPlayed
 
-		err := json.NewEncoder(w).Encode(data)
+		err := json.NewEncoder(w).
+			Encode(cache.CacheResponse[cacheDataResponse]{Data: data, Updated: c.Updated})
 		c.DataMutex.RUnlock()
 		if err != nil {
 			lumber.Error(err, "failed to write json data to request")
