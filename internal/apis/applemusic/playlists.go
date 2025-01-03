@@ -13,6 +13,12 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
+type playlistSummary struct {
+	Name       string `json:"name"`
+	TrackCount int    `json:"track_count"`
+	ID         string `json:"id"`
+}
+
 type playlist struct {
 	Name         string    `json:"name"`
 	Tracks       []song    `json:"tracks"`

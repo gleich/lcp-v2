@@ -1,6 +1,8 @@
 package applemusic
 
 import (
+	"encoding/json"
+	"net/http"
 	"time"
 
 	"github.com/gleich/lcp-v2/internal/cache"
@@ -26,17 +28,17 @@ func cacheUpdate() (cacheData, error) {
 		"p.LV0PX3EIl0EpDLW", // jazz
 		"p.AWXoZoxHLrvpJlY", // chill
 		"p.V7VYVB0hZo53MQv", // old man
-		// "p.qQXLxPLtA75zg8e", // 80s
-		// "p.LV0PXNoCl0EpDLW", // divorced dad
-		// "p.AWXoXPYSLrvpJlY", // alt
-		// "p.QvDQE5RIVbAeokL", // PARTY
-		// "p.LV0PXL3Cl0EpDLW", // bops
-		// "p.6xZaArOsvzb5OML", // focus
-		// "p.O1kz7EoFVmvz704", // funk
-		// "p.qQXLxPpFA75zg8e", // RAHHHHHHHH
-		// "p.qQXLxpDuA75zg8e", // ROCK
-		// "p.O1kz7zbsVmvz704", // country
-		// "p.QvDQEN0IVbAeokL", // fall
+		"p.qQXLxPLtA75zg8e", // 80s
+		"p.LV0PXNoCl0EpDLW", // divorced dad
+		"p.AWXoXPYSLrvpJlY", // alt
+		"p.QvDQE5RIVbAeokL", // PARTY
+		"p.LV0PXL3Cl0EpDLW", // bops
+		"p.6xZaArOsvzb5OML", // focus
+		"p.O1kz7EoFVmvz704", // funk
+		"p.qQXLxPpFA75zg8e", // RAHHHHHHHH
+		"p.qQXLxpDuA75zg8e", // ROCK
+		"p.O1kz7zbsVmvz704", // country
+		"p.QvDQEN0IVbAeokL", // fall
 		// "p.ZOAXAMZF4KMD6ob", // sad girl music
 		// "p.QvDQEebsVbAeokL", // christmas
 	}
@@ -62,9 +64,34 @@ func Setup(router *chi.Mux) {
 	}
 
 	applemusicCache := cache.New("applemusic", data)
-	router.Get("/applemusic", applemusicCache.ServeHTTP())
+	router.Get("/applemusic", serveHTTP(applemusicCache))
 	router.Get("/applemusic/playlists/{id}", playlistEndpoint(applemusicCache))
 	router.Handle("/applemusic/ws", applemusicCache.ServeWS())
 	go applemusicCache.UpdatePeriodically(cacheUpdate, 30*time.Second)
 	lumber.Done("setup apple music cache")
+}
+
+func serveHTTP(c *cache.Cache[cacheData]) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		c.DataMutex.RLock()
+
+		data := struct {
+			PlaylistSummaries []playlistSummary `json:"playlist_summaries"`
+			RecentlyPlayed    []song            `json:"recently_played"`
+		}{}
+		for _, p := range c.Data.Playlists {
+			data.PlaylistSummaries = append(
+				data.PlaylistSummaries,
+				playlistSummary{Name: p.Name, ID: p.ID, TrackCount: len(p.Tracks)},
+			)
+		}
+
+		err := json.NewEncoder(w).Encode(data)
+		c.DataMutex.RUnlock()
+		if err != nil {
+			lumber.Error(err, "failed to write json data to request")
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+	})
 }
