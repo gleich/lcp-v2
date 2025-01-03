@@ -14,9 +14,10 @@ import (
 )
 
 type playlistSummary struct {
-	Name       string `json:"name"`
-	TrackCount int    `json:"track_count"`
-	ID         string `json:"id"`
+	Name            string `json:"name"`
+	TrackCount      int    `json:"track_count"`
+	FirstFourTracks []song `json:"first_four_tracks"`
+	ID              string `json:"id"`
 }
 
 type playlist struct {

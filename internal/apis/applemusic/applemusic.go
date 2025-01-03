@@ -81,9 +81,20 @@ func serveHTTP(c *cache.Cache[cacheData]) http.HandlerFunc {
 			RecentlyPlayed    []song            `json:"recently_played"`
 		}{}
 		for _, p := range c.Data.Playlists {
+			firstFourTracks := []song{}
+			for _, track := range p.Tracks {
+				if len(firstFourTracks) < 4 {
+					firstFourTracks = append(firstFourTracks, track)
+				}
+			}
 			data.PlaylistSummaries = append(
 				data.PlaylistSummaries,
-				playlistSummary{Name: p.Name, ID: p.ID, TrackCount: len(p.Tracks)},
+				playlistSummary{
+					Name:            p.Name,
+					ID:              p.ID,
+					TrackCount:      len(p.Tracks),
+					FirstFourTracks: firstFourTracks,
+				},
 			)
 		}
 
