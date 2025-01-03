@@ -97,6 +97,7 @@ func serveHTTP(c *cache.Cache[cacheData]) http.HandlerFunc {
 				},
 			)
 		}
+		data.RecentlyPlayed = c.Data.RecentlyPlayed
 
 		err := json.NewEncoder(w).Encode(data)
 		c.DataMutex.RUnlock()
