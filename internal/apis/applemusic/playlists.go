@@ -24,6 +24,7 @@ type playlist struct {
 	Name         string    `json:"name"`
 	Tracks       []song    `json:"tracks"`
 	LastModified time.Time `json:"last_modified"`
+	URL          string    `json:"url"`
 	ID           string    `json:"id"`
 }
 
@@ -38,6 +39,9 @@ type playlistResponse struct {
 		Attributes struct {
 			LastModifiedDate time.Time `json:"lastModifiedDate"`
 			Name             string    `json:"name"`
+			PlayParams       struct {
+				GlobalID string `json:"globalId"`
+			} `json:"playParams"`
 		} `json:"attributes"`
 	} `json:"data"`
 }
@@ -82,6 +86,10 @@ func fetchPlaylist(id string) (playlist, error) {
 		LastModified: playlistData.Data[0].Attributes.LastModifiedDate,
 		Tracks:       tracks,
 		ID:           playlistData.Data[0].ID,
+		URL: fmt.Sprintf(
+			"https://music.apple.com/us/playlist/alt/%s",
+			playlistData.Data[0].Attributes.PlayParams.GlobalID,
+		),
 	}, nil
 }
 
