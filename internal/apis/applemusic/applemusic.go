@@ -28,17 +28,17 @@ func cacheUpdate() (cacheData, error) {
 		"p.LV0PX3EIl0EpDLW", // jazz
 		"p.AWXoZoxHLrvpJlY", // chill
 		"p.V7VYVB0hZo53MQv", // old man
-		// "p.qQXLxPLtA75zg8e", // 80s
-		// "p.LV0PXNoCl0EpDLW", // divorced dad
-		// "p.AWXoXPYSLrvpJlY", // alt
-		// "p.QvDQE5RIVbAeokL", // PARTY
-		// "p.LV0PXL3Cl0EpDLW", // bops
-		// "p.6xZaArOsvzb5OML", // focus
-		// "p.O1kz7EoFVmvz704", // funk
-		// "p.qQXLxPpFA75zg8e", // RAHHHHHHHH
-		// "p.qQXLxpDuA75zg8e", // ROCK
-		// "p.O1kz7zbsVmvz704", // country
-		// "p.QvDQEN0IVbAeokL", // fall
+		"p.qQXLxPLtA75zg8e", // 80s
+		"p.LV0PXNoCl0EpDLW", // divorced dad
+		"p.AWXoXPYSLrvpJlY", // alt
+		"p.QvDQE5RIVbAeokL", // PARTY
+		"p.LV0PXL3Cl0EpDLW", // bops
+		"p.6xZaArOsvzb5OML", // focus
+		"p.O1kz7EoFVmvz704", // funk
+		"p.qQXLxPpFA75zg8e", // RAHHHHHHHH
+		"p.qQXLxpDuA75zg8e", // ROCK
+		"p.O1kz7zbsVmvz704", // country
+		"p.QvDQEN0IVbAeokL", // fall
 		// "p.ZOAXAMZF4KMD6ob", // sad girl music
 		// "p.QvDQEebsVbAeokL", // christmas
 	}
