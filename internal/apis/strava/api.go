@@ -14,7 +14,7 @@ func sendStravaAPIRequest[T any](path string, tokens tokens) (T, error) {
 	var zeroValue T
 
 	req, err := http.NewRequest(
-		"GET",
+		http.MethodGet,
 		fmt.Sprintf("https://www.strava.com/%s", strings.TrimLeft(path, "/")),
 		nil,
 	)

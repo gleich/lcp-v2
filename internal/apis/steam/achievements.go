@@ -106,7 +106,7 @@ func fetchGameAchievements(appID int32) (*float32, *[]achievement, error) {
 		"format": {"json"},
 	}
 	req, err := http.NewRequest(
-		"GET",
+		http.MethodGet,
 		"https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2?"+params.Encode(),
 		nil,
 	)

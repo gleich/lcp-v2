@@ -38,7 +38,11 @@ func (t *tokens) refreshIfNeeded() {
 		"refresh_token": {t.Refresh},
 		"code":          {secrets.SECRETS.StravaOAuthCode},
 	}
-	req, err := http.NewRequest("POST", "https://www.strava.com/oauth/token?"+params.Encode(), nil)
+	req, err := http.NewRequest(
+		http.MethodPost,
+		"https://www.strava.com/oauth/token?"+params.Encode(),
+		nil,
+	)
 	if err != nil {
 		lumber.Error(err, "creating request for new token failed")
 		return

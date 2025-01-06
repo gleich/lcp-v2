@@ -14,7 +14,7 @@ import (
 func sendAppleMusicAPIRequest[T any](path string) (T, error) {
 	var zeroValue T
 	req, err := http.NewRequest(
-		"GET",
+		http.MethodGet,
 		fmt.Sprintf("https://api.music.apple.com/%s", strings.TrimLeft(path, "/")),
 		nil,
 	)

@@ -47,7 +47,7 @@ func fetchRecentlyPlayedGames() ([]game, error) {
 		"include_appinfo": {"true"},
 		"format":          {"json"},
 	}
-	req, err := http.NewRequest("GET",
+	req, err := http.NewRequest(http.MethodGet,
 		"https://api.steampowered.com/IPlayerService/GetOwnedGames/v1?"+params.Encode(), nil,
 	)
 	if err != nil {
