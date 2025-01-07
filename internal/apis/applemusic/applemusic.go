@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gleich/lcp-v2/internal/auth"
 	"github.com/gleich/lcp-v2/internal/cache"
 	"github.com/gleich/lumber/v3"
 	"github.com/go-chi/chi/v5"
@@ -77,6 +78,7 @@ type cacheDataResponse struct {
 
 func serveHTTP(c *cache.Cache[cacheData]) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		auth.IsAuthorized(w, r)
 		w.Header().Set("Content-Type", "application/json")
 		c.DataMutex.RLock()
 

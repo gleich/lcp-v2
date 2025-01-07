@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gleich/lcp-v2/internal/apis"
+	"github.com/gleich/lcp-v2/internal/auth"
 	"github.com/gleich/lcp-v2/internal/secrets"
 	"github.com/gleich/lumber/v3"
 )
@@ -41,6 +42,7 @@ type CacheResponse[T any] struct {
 
 func (c *Cache[T]) ServeHTTP() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		auth.IsAuthorized(w, r)
 		w.Header().Set("Content-Type", "application/json")
 		c.DataMutex.RLock()
 		err := json.NewEncoder(w).Encode(CacheResponse[T]{Data: c.Data, Updated: c.Updated})

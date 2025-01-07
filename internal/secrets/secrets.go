@@ -9,6 +9,7 @@ import (
 var SECRETS Secrets
 
 type Secrets struct {
+	ValidToken  string `env:"VALID_TOKEN"`
 	CacheFolder string `env:"CACHE_FOLDER"`
 
 	StravaClientID       string `env:"STRAVA_CLIENT_ID"`
