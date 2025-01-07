@@ -82,9 +82,8 @@ func (c *Cache[T]) Update(data T) {
 }
 
 func (c *Cache[T]) UpdatePeriodically(update func() (T, error), interval time.Duration) {
-	ticker := time.NewTicker(interval)
-	defer ticker.Stop()
-	for range ticker.C {
+	for {
+		time.Sleep(interval)
 		data, err := update()
 		if err != nil {
 			if !errors.Is(err, apis.WarningError) {
