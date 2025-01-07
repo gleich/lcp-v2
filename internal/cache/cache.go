@@ -13,31 +13,21 @@ import (
 	"github.com/gleich/lcp-v2/internal/apis"
 	"github.com/gleich/lcp-v2/internal/secrets"
 	"github.com/gleich/lumber/v3"
-	"github.com/gorilla/websocket"
 )
 
 type Cache[T any] struct {
-	name            string
-	DataMutex       sync.RWMutex
-	Data            T
-	Updated         time.Time
-	filePath        string
-	wsConnPool      map[*websocket.Conn]bool
-	wsConnPoolMutex sync.Mutex
-	wsUpgrader      websocket.Upgrader
+	name      string
+	DataMutex sync.RWMutex
+	Data      T
+	Updated   time.Time
+	filePath  string
 }
 
 func New[T any](name string, data T) *Cache[T] {
 	cache := Cache[T]{
-		name:       name,
-		Updated:    time.Now(),
-		filePath:   filepath.Join(secrets.SECRETS.CacheFolder, fmt.Sprintf("%s.json", name)),
-		wsConnPool: make(map[*websocket.Conn]bool),
-		wsUpgrader: websocket.Upgrader{
-			CheckOrigin: func(r *http.Request) bool {
-				return true
-			},
-		},
+		name:     name,
+		Updated:  time.Now(),
+		filePath: filepath.Join(secrets.SECRETS.CacheFolder, fmt.Sprintf("%s.json", name)),
 	}
 	cache.loadFromFile()
 	cache.Update(data)
@@ -83,16 +73,7 @@ func (c *Cache[T]) Update(data T) {
 		c.DataMutex.Unlock()
 
 		c.persistToFile()
-		connectionsUpdated := c.broadcastUpdate()
-		if connectionsUpdated == 0 {
-			lumber.Done(strings.ToUpper(c.name), "cache updated")
-		} else {
-			lumber.Done(
-				strings.ToUpper(c.name),
-				"cache updated;",
-				"updated", connectionsUpdated, "websocket connections",
-			)
-		}
+		lumber.Done(strings.ToUpper(c.name), "cache updated")
 	}
 }
 

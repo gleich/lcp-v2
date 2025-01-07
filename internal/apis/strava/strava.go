@@ -29,7 +29,6 @@ func Setup(router *chi.Mux) {
 	}
 	stravaCache := cache.New("strava", stravaActivities)
 	router.Get("/strava", stravaCache.ServeHTTP())
-	router.Handle("/strava/ws", stravaCache.ServeWS())
 	router.Post("/strava/event", eventRoute(stravaCache, *minioClient, stravaTokens))
 	router.Get("/strava/event", challengeRoute)
 
