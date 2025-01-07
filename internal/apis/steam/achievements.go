@@ -90,7 +90,7 @@ func fetchGameAchievements(appID int32) (*float32, *[]achievement, error) {
 	}
 
 	if playerAchievements.PlayerStats.Achievements == nil {
-		return nil, nil, err
+		return nil, nil, nil
 	}
 
 	params = url.Values{
