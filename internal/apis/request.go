@@ -35,7 +35,8 @@ func SendRequest[T any](req *http.Request) (T, error) {
 		)
 		if resp.StatusCode == http.StatusBadGateway ||
 			resp.StatusCode == http.StatusGatewayTimeout ||
-			resp.StatusCode == http.StatusInternalServerError {
+			resp.StatusCode == http.StatusInternalServerError ||
+			resp.StatusCode == http.StatusBadRequest {
 			lumber.Warning(err)
 			return zeroValue, WarningError
 		} else {
