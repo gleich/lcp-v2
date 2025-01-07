@@ -3,7 +3,6 @@ package apis
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
 
@@ -28,21 +27,13 @@ func SendRequest[T any](req *http.Request) (T, error) {
 		return zeroValue, err
 	}
 	if resp.StatusCode != http.StatusOK {
-		err = fmt.Errorf(
-			"status code of %d returned from API. Code of 200 expected from %s",
+		lumber.Warning(
+			"status code of",
 			resp.StatusCode,
+			"returned from API. Code of 200 expected from",
 			req.URL.String(),
 		)
-		if resp.StatusCode == http.StatusBadGateway ||
-			resp.StatusCode == http.StatusGatewayTimeout ||
-			resp.StatusCode == http.StatusInternalServerError ||
-			resp.StatusCode == http.StatusBadRequest {
-			lumber.Warning(err)
-			return zeroValue, WarningError
-		} else {
-			lumber.Error(err)
-		}
-		return zeroValue, err
+		return zeroValue, WarningError
 	}
 
 	var data T
