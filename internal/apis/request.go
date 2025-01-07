@@ -22,6 +22,10 @@ func SendRequest[T any](req *http.Request) (T, error) {
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
+	if errors.Is(err, io.EOF) {
+		lumber.Warning("EOF from", req.URL.String())
+		return zeroValue, WarningError
+	}
 	if err != nil {
 		lumber.Error(err, "reading response body failed")
 		return zeroValue, err
