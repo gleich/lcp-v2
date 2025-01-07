@@ -96,7 +96,9 @@ func fetchPlaylist(id string) (playlist, error) {
 
 func playlistEndpoint(c *cache.Cache[cacheData]) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		auth.IsAuthorized(w, r)
+		if !auth.IsAuthorized(w, r) {
+			return
+		}
 		id := chi.URLParam(r, "id")
 
 		c.DataMutex.RLock()

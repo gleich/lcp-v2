@@ -42,7 +42,9 @@ type CacheResponse[T any] struct {
 
 func (c *Cache[T]) ServeHTTP() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		auth.IsAuthorized(w, r)
+		if !auth.IsAuthorized(w, r) {
+			return
+		}
 		w.Header().Set("Content-Type", "application/json")
 		c.DataMutex.RLock()
 		err := json.NewEncoder(w).Encode(CacheResponse[T]{Data: c.Data, Updated: c.Updated})

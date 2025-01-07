@@ -78,7 +78,9 @@ type cacheDataResponse struct {
 
 func serveHTTP(c *cache.Cache[cacheData]) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		auth.IsAuthorized(w, r)
+		if !auth.IsAuthorized(w, r) {
+			return
+		}
 		w.Header().Set("Content-Type", "application/json")
 		c.DataMutex.RLock()
 
