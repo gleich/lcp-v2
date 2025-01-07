@@ -31,12 +31,7 @@ func SendRequest[T any](req *http.Request) (T, error) {
 		return zeroValue, err
 	}
 	if resp.StatusCode != http.StatusOK {
-		lumber.Warning(
-			"status code of",
-			resp.StatusCode,
-			"returned from API. Code of 200 expected from",
-			req.URL.String(),
-		)
+		lumber.Warning(resp.StatusCode, "returned from", req.URL.String())
 		return zeroValue, WarningError
 	}
 
