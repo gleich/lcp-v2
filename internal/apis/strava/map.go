@@ -9,7 +9,7 @@ import (
 
 	"github.com/gleich/lumber/v3"
 	"github.com/minio/minio-go/v7"
-	"pkg.mattglei.ch/lcp-v2/internal/secrets"
+	"pkg.mattglei.ch/lcp-2/internal/secrets"
 )
 
 const bucketName = "mapbox-maps"

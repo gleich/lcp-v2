@@ -8,8 +8,8 @@ import (
 	"github.com/gleich/lumber/v3"
 	"github.com/shurcooL/githubv4"
 	"golang.org/x/oauth2"
-	"pkg.mattglei.ch/lcp-v2/internal/cache"
-	"pkg.mattglei.ch/lcp-v2/internal/secrets"
+	"pkg.mattglei.ch/lcp-2/internal/cache"
+	"pkg.mattglei.ch/lcp-2/internal/secrets"
 )
 
 func Setup(mux *http.ServeMux) {

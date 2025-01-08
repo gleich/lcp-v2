@@ -1,4 +1,4 @@
-module pkg.mattglei.ch/lcp-v2
+module pkg.mattglei.ch/lcp-2
 
 go 1.23
 

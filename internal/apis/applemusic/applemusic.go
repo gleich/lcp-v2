@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/gleich/lumber/v3"
-	"pkg.mattglei.ch/lcp-v2/internal/auth"
-	"pkg.mattglei.ch/lcp-v2/internal/cache"
+	"pkg.mattglei.ch/lcp-2/internal/auth"
+	"pkg.mattglei.ch/lcp-2/internal/cache"
 )
 
 const API_ENDPOINT = "https://api.music.apple.com/"

@@ -5,11 +5,11 @@ import (
 	"time"
 
 	"github.com/gleich/lumber/v3"
-	"pkg.mattglei.ch/lcp-v2/internal/apis/applemusic"
-	"pkg.mattglei.ch/lcp-v2/internal/apis/github"
-	"pkg.mattglei.ch/lcp-v2/internal/apis/steam"
-	"pkg.mattglei.ch/lcp-v2/internal/apis/strava"
-	"pkg.mattglei.ch/lcp-v2/internal/secrets"
+	"pkg.mattglei.ch/lcp-2/internal/apis/applemusic"
+	"pkg.mattglei.ch/lcp-2/internal/apis/github"
+	"pkg.mattglei.ch/lcp-2/internal/apis/steam"
+	"pkg.mattglei.ch/lcp-2/internal/apis/strava"
+	"pkg.mattglei.ch/lcp-2/internal/secrets"
 )
 
 func main() {

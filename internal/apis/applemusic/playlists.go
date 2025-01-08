@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/gleich/lumber/v3"
-	"pkg.mattglei.ch/lcp-v2/internal/apis"
-	"pkg.mattglei.ch/lcp-v2/internal/auth"
-	"pkg.mattglei.ch/lcp-v2/internal/cache"
+	"pkg.mattglei.ch/lcp-2/internal/apis"
+	"pkg.mattglei.ch/lcp-2/internal/auth"
+	"pkg.mattglei.ch/lcp-2/internal/cache"
 )
 
 type playlistSummary struct {

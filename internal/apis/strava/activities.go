@@ -8,7 +8,7 @@ import (
 
 	"github.com/gleich/lumber/v3"
 	"github.com/minio/minio-go/v7"
-	"pkg.mattglei.ch/lcp-v2/internal/images"
+	"pkg.mattglei.ch/lcp-2/internal/images"
 )
 
 type stravaActivity struct {

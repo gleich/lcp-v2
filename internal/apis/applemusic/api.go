@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/gleich/lumber/v3"
-	"pkg.mattglei.ch/lcp-v2/internal/apis"
-	"pkg.mattglei.ch/lcp-v2/internal/secrets"
+	"pkg.mattglei.ch/lcp-2/internal/apis"
+	"pkg.mattglei.ch/lcp-2/internal/secrets"
 )
 
 func sendAppleMusicAPIRequest[T any](path string) (T, error) {
