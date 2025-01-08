@@ -24,14 +24,16 @@ type Cache[T any] struct {
 	filePath  string
 }
 
-func New[T any](name string, data T) *Cache[T] {
+func New[T any](name string, data T, update bool) *Cache[T] {
 	cache := Cache[T]{
 		name:     name,
 		Updated:  time.Now(),
 		filePath: filepath.Join(secrets.SECRETS.CacheFolder, fmt.Sprintf("%s.json", name)),
 	}
 	cache.loadFromFile()
-	cache.Update(data)
+	if update {
+		cache.Update(data)
+	}
 	return &cache
 }
 

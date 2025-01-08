@@ -61,10 +61,10 @@ func cacheUpdate() (cacheData, error) {
 func Setup(mux *http.ServeMux) {
 	data, err := cacheUpdate()
 	if err != nil {
-		lumber.Fatal(err, "initial fetch of cache data failed")
+		lumber.Error(err, "initial fetch of cache data failed")
 	}
 
-	applemusicCache := cache.New("applemusic", data)
+	applemusicCache := cache.New("applemusic", data, err == nil)
 	mux.HandleFunc("GET /applemusic", serveHTTP(applemusicCache))
 	mux.HandleFunc("GET /applemusic/playlists/{id}", playlistEndpoint(applemusicCache))
 	go applemusicCache.UpdatePeriodically(cacheUpdate, 30*time.Second)

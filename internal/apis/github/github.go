@@ -21,10 +21,10 @@ func Setup(mux *http.ServeMux) {
 
 	pinnedRepos, err := fetchPinnedRepos(githubClient)
 	if err != nil {
-		lumber.Fatal(err, "fetching initial pinned repos failed")
+		lumber.Error(err, "fetching initial pinned repos failed")
 	}
 
-	githubCache := cache.New("github", pinnedRepos)
+	githubCache := cache.New("github", pinnedRepos, err == nil)
 	mux.HandleFunc("GET /github", githubCache.ServeHTTP)
 	go githubCache.UpdatePeriodically(
 		func() ([]repository, error) { return fetchPinnedRepos(githubClient) },

@@ -26,9 +26,10 @@ func Setup(mux *http.ServeMux) {
 	}
 	stravaActivities, err := fetchActivities(*minioClient, stravaTokens)
 	if err != nil {
-		lumber.ErrorMsg("failed to load initial data for strava cache; not updating")
+		lumber.Error(err, "failed to load initial data for strava cache; not updating")
 	}
-	stravaCache := cache.New("strava", stravaActivities)
+	stravaCache := cache.New("strava", stravaActivities, err == nil)
+
 	mux.HandleFunc("GET /strava", stravaCache.ServeHTTP)
 	mux.HandleFunc("POST /strava/event", eventRoute(stravaCache, *minioClient, stravaTokens))
 	mux.HandleFunc("GET /strava/event", challengeRoute)

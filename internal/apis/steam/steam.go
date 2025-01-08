@@ -11,10 +11,10 @@ import (
 func Setup(mux *http.ServeMux) {
 	games, err := fetchRecentlyPlayedGames()
 	if err != nil {
-		lumber.Fatal(err, "initial fetch of games failed")
+		lumber.Error(err, "initial fetch of games failed")
 	}
 
-	steamCache := cache.New("steam", games)
+	steamCache := cache.New("steam", games, err == nil)
 	mux.HandleFunc("GET /steam", steamCache.ServeHTTP)
 	go steamCache.UpdatePeriodically(fetchRecentlyPlayedGames, 5*time.Minute)
 	lumber.Done("setup steam cache")
