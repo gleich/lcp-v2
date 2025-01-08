@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/gleich/lcp-v2/internal/secrets"
+	"pkg.mattglei.ch/lcp-v2/internal/secrets"
 )
 
 func IsAuthorized(w http.ResponseWriter, r *http.Request) bool {

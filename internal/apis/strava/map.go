@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/gleich/lcp-v2/internal/secrets"
 	"github.com/gleich/lumber/v3"
 	"github.com/minio/minio-go/v7"
+	"pkg.mattglei.ch/lcp-v2/internal/secrets"
 )
 
 const bucketName = "mapbox-maps"

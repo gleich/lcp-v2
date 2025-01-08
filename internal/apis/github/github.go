@@ -4,12 +4,12 @@ import (
 	"context"
 	"time"
 
-	"github.com/gleich/lcp-v2/internal/cache"
-	"github.com/gleich/lcp-v2/internal/secrets"
 	"github.com/gleich/lumber/v3"
 	"github.com/go-chi/chi/v5"
 	"github.com/shurcooL/githubv4"
 	"golang.org/x/oauth2"
+	"pkg.mattglei.ch/lcp-v2/internal/cache"
+	"pkg.mattglei.ch/lcp-v2/internal/secrets"
 )
 
 func Setup(router *chi.Mux) {

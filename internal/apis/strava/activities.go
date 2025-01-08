@@ -6,9 +6,9 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/gleich/lcp-v2/internal/images"
 	"github.com/gleich/lumber/v3"
 	"github.com/minio/minio-go/v7"
+	"pkg.mattglei.ch/lcp-v2/internal/images"
 )
 
 type stravaActivity struct {

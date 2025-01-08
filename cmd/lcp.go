@@ -4,14 +4,14 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gleich/lcp-v2/internal/apis/applemusic"
-	"github.com/gleich/lcp-v2/internal/apis/github"
-	"github.com/gleich/lcp-v2/internal/apis/steam"
-	"github.com/gleich/lcp-v2/internal/apis/strava"
-	"github.com/gleich/lcp-v2/internal/secrets"
 	"github.com/gleich/lumber/v3"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"pkg.mattglei.ch/lcp-v2/internal/apis/applemusic"
+	"pkg.mattglei.ch/lcp-v2/internal/apis/github"
+	"pkg.mattglei.ch/lcp-v2/internal/apis/steam"
+	"pkg.mattglei.ch/lcp-v2/internal/apis/strava"
+	"pkg.mattglei.ch/lcp-v2/internal/secrets"
 )
 
 func main() {

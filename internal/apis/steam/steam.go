@@ -3,9 +3,9 @@ package steam
 import (
 	"time"
 
-	"github.com/gleich/lcp-v2/internal/cache"
 	"github.com/gleich/lumber/v3"
 	"github.com/go-chi/chi/v5"
+	"pkg.mattglei.ch/lcp-v2/internal/cache"
 )
 
 func Setup(router *chi.Mux) {

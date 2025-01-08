@@ -10,10 +10,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gleich/lcp-v2/internal/apis"
-	"github.com/gleich/lcp-v2/internal/auth"
-	"github.com/gleich/lcp-v2/internal/secrets"
 	"github.com/gleich/lumber/v3"
+	"pkg.mattglei.ch/lcp-v2/internal/apis"
+	"pkg.mattglei.ch/lcp-v2/internal/auth"
+	"pkg.mattglei.ch/lcp-v2/internal/secrets"
 )
 
 type Cache[T any] struct {

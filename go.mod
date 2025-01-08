@@ -1,4 +1,4 @@
-module github.com/gleich/lcp-v2
+module pkg.mattglei.ch/lcp-v2
 
 go 1.23
 
