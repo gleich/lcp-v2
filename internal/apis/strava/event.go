@@ -27,12 +27,12 @@ func eventRoute(
 	tokens tokens,
 ) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		defer r.Body.Close()
 		body, err := io.ReadAll(r.Body)
 		if err != nil {
 			lumber.Error(err, "reading response body failed")
 			return
 		}
+		defer r.Body.Close()
 
 		var eventData event
 		err = json.Unmarshal(body, &eventData)

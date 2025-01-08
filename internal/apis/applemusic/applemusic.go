@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/gleich/lumber/v3"
-	"github.com/go-chi/chi/v5"
 	"pkg.mattglei.ch/lcp-v2/internal/auth"
 	"pkg.mattglei.ch/lcp-v2/internal/cache"
 )
@@ -59,15 +58,15 @@ func cacheUpdate() (cacheData, error) {
 	}, nil
 }
 
-func Setup(router *chi.Mux) {
+func Setup(mux *http.ServeMux) {
 	data, err := cacheUpdate()
 	if err != nil {
 		lumber.Fatal(err, "initial fetch of cache data failed")
 	}
 
 	applemusicCache := cache.New("applemusic", data)
-	router.Get("/applemusic", serveHTTP(applemusicCache))
-	router.Get("/applemusic/playlists/{id}", playlistEndpoint(applemusicCache))
+	mux.HandleFunc("GET /applemusic", serveHTTP(applemusicCache))
+	mux.HandleFunc("GET /applemusic/playlists/{id}", playlistEndpoint(applemusicCache))
 	go applemusicCache.UpdatePeriodically(cacheUpdate, 30*time.Second)
 	lumber.Done("setup apple music cache")
 }
@@ -82,6 +81,7 @@ func serveHTTP(c *cache.Cache[cacheData]) http.HandlerFunc {
 		if !auth.IsAuthorized(w, r) {
 			return
 		}
+
 		w.Header().Set("Content-Type", "application/json")
 		c.DataMutex.RLock()
 

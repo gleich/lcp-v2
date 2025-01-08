@@ -2,17 +2,17 @@ package github
 
 import (
 	"context"
+	"net/http"
 	"time"
 
 	"github.com/gleich/lumber/v3"
-	"github.com/go-chi/chi/v5"
 	"github.com/shurcooL/githubv4"
 	"golang.org/x/oauth2"
 	"pkg.mattglei.ch/lcp-v2/internal/cache"
 	"pkg.mattglei.ch/lcp-v2/internal/secrets"
 )
 
-func Setup(router *chi.Mux) {
+func Setup(mux *http.ServeMux) {
 	githubTokenSource := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: secrets.SECRETS.GitHubAccessToken},
 	)
@@ -25,7 +25,7 @@ func Setup(router *chi.Mux) {
 	}
 
 	githubCache := cache.New("github", pinnedRepos)
-	router.Get("/github", githubCache.ServeHTTP())
+	mux.HandleFunc("GET /github", githubCache.ServeHTTP)
 	go githubCache.UpdatePeriodically(
 		func() ([]repository, error) { return fetchPinnedRepos(githubClient) },
 		1*time.Minute,

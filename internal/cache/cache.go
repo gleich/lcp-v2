@@ -40,21 +40,19 @@ type CacheResponse[T any] struct {
 	Updated time.Time `json:"updated"`
 }
 
-func (c *Cache[T]) ServeHTTP() http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !auth.IsAuthorized(w, r) {
-			return
-		}
-		w.Header().Set("Content-Type", "application/json")
-		c.DataMutex.RLock()
-		err := json.NewEncoder(w).Encode(CacheResponse[T]{Data: c.Data, Updated: c.Updated})
-		c.DataMutex.RUnlock()
-		if err != nil {
-			err = fmt.Errorf("%v failed to write json data to request", err)
-			lumber.Error(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-	})
+func (c *Cache[T]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if !auth.IsAuthorized(w, r) {
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	c.DataMutex.RLock()
+	err := json.NewEncoder(w).Encode(CacheResponse[T]{Data: c.Data, Updated: c.Updated})
+	c.DataMutex.RUnlock()
+	if err != nil {
+		err = fmt.Errorf("%v failed to write json data to request", err)
+		lumber.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func (c *Cache[T]) Update(data T) {

@@ -5,8 +5,6 @@ import (
 	"time"
 
 	"github.com/gleich/lumber/v3"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 	"pkg.mattglei.ch/lcp-v2/internal/apis/applemusic"
 	"pkg.mattglei.ch/lcp-v2/internal/apis/github"
 	"pkg.mattglei.ch/lcp-v2/internal/apis/steam"
@@ -20,18 +18,16 @@ func main() {
 
 	secrets.Load()
 
-	r := chi.NewRouter()
-	r.Use(middleware.Recoverer)
-	r.Use(middleware.RedirectSlashes)
-	r.HandleFunc("/", rootRedirect)
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", rootRedirect)
 
-	github.Setup(r)
-	strava.Setup(r)
-	steam.Setup(r)
-	applemusic.Setup(r)
+	github.Setup(mux)
+	strava.Setup(mux)
+	steam.Setup(mux)
+	applemusic.Setup(mux)
 
 	lumber.Info("starting server")
-	err := http.ListenAndServe(":8000", r)
+	err := http.ListenAndServe(":8000", mux)
 	if err != nil {
 		lumber.Fatal(err, "failed to start router")
 	}

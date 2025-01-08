@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/gleich/lumber/v3"
-	"github.com/go-chi/chi/v5"
 	"pkg.mattglei.ch/lcp-v2/internal/apis"
 	"pkg.mattglei.ch/lcp-v2/internal/auth"
 	"pkg.mattglei.ch/lcp-v2/internal/cache"
@@ -99,7 +98,7 @@ func playlistEndpoint(c *cache.Cache[cacheData]) http.HandlerFunc {
 		if !auth.IsAuthorized(w, r) {
 			return
 		}
-		id := chi.URLParam(r, "id")
+		id := r.PathValue("id")
 
 		c.DataMutex.RLock()
 		var p *playlist
