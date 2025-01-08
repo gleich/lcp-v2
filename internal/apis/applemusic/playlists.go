@@ -119,8 +119,9 @@ func playlistEndpoint(c *cache.Cache[cacheData]) http.HandlerFunc {
 		err := json.NewEncoder(w).Encode(p)
 		c.DataMutex.RUnlock()
 		if err != nil {
-			lumber.Error(err, "failed to write json data to request")
-			w.WriteHeader(http.StatusInternalServerError)
+			err = fmt.Errorf("%v failed to write json data to request", err)
+			lumber.Error(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	})
 }
