@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"net"
 	"net/http"
 
 	"github.com/gleich/lumber/v3"
@@ -22,11 +23,18 @@ func SendRequest[T any](req *http.Request) (T, error) {
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
-	if errors.Is(err, io.ErrUnexpectedEOF) {
-		lumber.Warning("Unexpected EOF from", req.URL.String())
-		return zeroValue, WarningError
-	}
 	if err != nil {
+		if errors.Is(err, io.ErrUnexpectedEOF) {
+			lumber.Warning("Unexpected EOF from", req.URL.String())
+			return zeroValue, WarningError
+		}
+		var netErr *net.OpError
+		if errors.As(err, &netErr) && netErr.Err != nil &&
+			netErr.Err.Error() == "connection reset by peer" {
+			lumber.Warning("TCP connection reset by peer from", req.URL.String())
+			return zeroValue, WarningError
+		}
+
 		lumber.Error(err, "reading response body failed")
 		return zeroValue, err
 	}
